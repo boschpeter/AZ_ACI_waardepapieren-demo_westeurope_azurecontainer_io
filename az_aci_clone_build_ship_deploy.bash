@@ -188,6 +188,7 @@ LOG_FILE=${LOG_DIR}/LOG_${LOG_START_DATE_TIME}.log
 DOCKER_COMPOSE_DIR=${GITHUB_DIR}
 DOCKER_CLERK_FRONTEND_DIR=${GITHUB_DIR}/clerk-frontend
 DOCKER_WAARDEPAPIEREN_SERVICE_DIR=${GITHUB_DIR}/waardepapieren-service
+WAARDEPAPIEREN_SERVICE_CONFIG_DIR=${GITHUB_DIR}/waardepapieren-service/configuration
 DOCKER_MOCK_NLX_DIR=${GITHUB_DIR}/mock-nlx
 
 SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME=true       # mimic native Dockerfile build  #! no volumes , no links (bridged docker network)
@@ -594,10 +595,10 @@ TT_INSPECT_FILE=""
 # Arguments: waardepapieren_service_config_compose_travis_json 
 # Return:  waardepapieren-config-compose-travis.json
 ##################################################################
-waardepapieren_service_config_compose_travis_json () {
+waardepapieren_service_config_compose_travis_json() {
 echo "- Running ... waardepapieren_service_config_compose_travis_json"
 
-TT_DIRECTORY=$WAARDEPAPIEREN_SERVICE_CONFIG_DIR
+TT_DIRECTORY=d
 TT_INSPECT_FILE=waardepapieren-config-compose-travis.json
 enter_touch
 
@@ -639,7 +640,7 @@ TT_INSPECT_FILE=""
 # Return: waardepapieren-config-compose.json
 
 ##################################################################
-waardepapieren_service_config_compose_json () {
+waardepapieren_service_config_compose_json() {
 echo "- Running ... waardepapieren_service_config_compose_json"
 
 TT_DIRECTORY=$WAARDEPAPIEREN_SERVICE_CONFIG_DIR
@@ -683,7 +684,7 @@ TT_INSPECT_FILE=""
 # Arguments: waardepapieren_service_config_json 
 # Return: #waardepapieren-config.json
 ##################################################################
-waardepapieren_service_config_json () {
+waardepapieren_service_config_json() {
 echo "- Running ... waardepapieren_service_config_json"
 
 TT_DIRECTORY=$WAARDEPAPIEREN_SERVICE_CONFIG_DIR
@@ -1042,7 +1043,7 @@ if [ -f "${TT_INSPECT_FILE}" ]; then
  
 create_logfile_header
 echo "| ${LOG_START_DATE_TIME} | ${TT_DIRECTORY} |"                                  >> $LOG_FILE
-echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE
+echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE                             
 echo "<code>"                                                                        >> $LOG_FILE
 cat  ${TT_INSPECT_FILE}                                                              >> $LOG_FILE
 echo "</code>"                                                                       >> $LOG_FILE
@@ -1059,13 +1060,15 @@ if [ ${PROMPT} = true ]
 then 
 clear
 echo "========="
-echo "enter inspect  ${TT_INSPECT_FILE}"
+echo "enter inspect  ${TT_DIRECTORY} "  
+echo "${TT_INSPECT_FILE}"
 echo "========="
 echo ""
 cat  ${TT_INSPECT_FILE}
 echo ""
 echo "========="
-echo "eof inspect  ${TT_INSPECT_FILE}"
+echo "eof inspect  ${TT_DIRECTORY} "
+echo  ${TT_INSPECT_FILE}
 echo "========="
 enter_cont
 
