@@ -771,7 +771,7 @@ echo "location: westeurope
 name: $AZ_RESOURCE_GROUP
 properties:
   containers:
-  - name: waardepapieren-mock-nlx
+  - name: ${MOCK_NLX_IMAGE}
     properties:
       image: $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG
       resources:
@@ -780,7 +780,7 @@ properties:
           memoryInGb: 0.5
       ports:
       - port: 80
-  - name: waardepapieren-service
+  - name: ${SERVICE_IMAGE}:
     properties:
       image: $DOCKER_USER/${SERVICE_IMAGE}:$DOCKER_VERSION_TAG
       resources:
@@ -789,7 +789,7 @@ properties:
           memoryInGb: 0.5
       ports:
       - port: 3232
-  - name: waardepapieren-clerk-frontend
+  - name: ${CLERK_FRONTEND_IMAGE}
     properties:
       image: $DOCKER_USER/${CLERK_FRONTEND_IMAGE}:$DOCKER_VERSION_TAG
       resources:
