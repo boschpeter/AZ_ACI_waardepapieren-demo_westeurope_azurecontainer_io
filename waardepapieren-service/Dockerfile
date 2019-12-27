@@ -20,6 +20,9 @@ ADD configuration/waardepapieren-config-compose-travis.json /app/configuration
 ADD configuration/waardepapieren-config.json /app/configuration
 ENV WAARDEPAPIEREN_CONFIG /app/configuration/waardepapieren-config.json
 ENV TZ=Europe/Amsterdam
+RUN apt-get update 
+RUN apt-get install -y iputils-ping
+RUN apt-get install -y net-tools
 
 RUN npm install --production
 CMD npm start

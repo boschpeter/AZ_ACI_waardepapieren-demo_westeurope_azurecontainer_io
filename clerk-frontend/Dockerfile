@@ -18,6 +18,9 @@ COPY --from=0 /app/build /usr/share/nginx/html
 #  volumes:
 #    - ./clerk-frontend/nginx/certs:/etc/nginx/certs:rw
 RUN mkdir /etc/nginx/certs
-RUN apt-get update && apt-get install -y iputils-ping
+RUN apt-get update 
+RUN apt-get install -y iputils-ping
+RUN apt-get install -y net-tools
+
 ADD nginx/certs/org.crt /etc/nginx/certs/org.crt
 ADD nginx/certs/org.key /etc/nginx/certs/org.key
