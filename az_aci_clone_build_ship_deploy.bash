@@ -801,6 +801,7 @@ git config --global credential.helper store
 git config --global user.email "bosch.peter@icloud.com"
 git config --global user.name "BoschPeter"
 git config --global user.password "Peter\!2020"
+
 }
 
 
@@ -980,6 +981,21 @@ git config --global user.password "Peter\!2020"
 #cd into 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #/////////////////////////////////////////////////////////////////
 ##################################################################
@@ -1268,16 +1284,29 @@ echo "</code>"                                                               >> 
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 #/////////////////////////////////////////////////////////////////////////////////////////////
 #######################
 ## M A I N
-# program starts here actually  iciici
+# program starts here actually  
 #######################
 #/////////////////////////////////////////////////////////////////////////////////////////////
 
 
 echo "***"   
-echo "***  Welcome to  docker-compose  "
+echo "***  Welcome to  docker build   "
 echo "***"   
 echo "***" download clone build run ship and deploy to AZURE CLOUD 
 echo "***  You are about to start to build new waardepapieren images and containers "
@@ -1372,26 +1401,23 @@ echo "AZ_RESOURCE_GROUP="${AZ_RESOURCE_GROUP}       #"Discipl_Wigo4it_DockerGrou
 echo "AZ_RESOURCE_GROUP_DELETE="$AZ_RESOURCE_GROUP_DELETE         #true
 echo "AZ_RESOURCE_GROUP_CREATE="$AZ_RESOURCE_GROUP_CREATE        #true
 echo "CREATE_AZ_DEPLOY_ACI_YAML="$CREATE_AZ_DEPLOY_ACI_YAML        #true  #@PROJECT_DIR deploy_aci.yml
-echo "CMD_AZ_CREATE_CONTAINERGROUP="$CMD_AZ_CREATE_CONTAINERGROUP        #true  #.. jeuh - - Running ... ..
-enter_cont
+echo "CMD_AZ_CREATE_CONTAINERGROUP="$CMD_AZ_CREATE_CONTAINERGROUP        #true  #..nt
 
 #echo "#######################"
 #echo "## end of feedbak 
 #echo "#######################" 
 echo "" 
 echo "" 
-#echo "hope the run will be okay. "
-#enter_cont
 clear
 fi
 
-create_logdir
 
+create_logdir
 create_directories
 
 
 #######################
-## cLONING from github repo starts here.
+## CLONING
 #######################
 
 if [ ${CMD_GIT_CLONE} = true ] 
@@ -1409,12 +1435,11 @@ create_logdir
 
 create_directories
 
-
-
+#/////////////////////////////////////////////////////////////////////////////////////////////
 #######################
-## configuration Docker Compose   docker-compose -f docker-compose-travis.yml --build
+## SET 
 #######################
-
+#/////////////////////////////////////////////////////////////////////////////////////////////
 
 if [ $SET_DOCKERCOMPOSE_TRAVIS_WITH_VOLUME = true ]
   then docker_compose_travis_yml_with_volumes
@@ -1423,13 +1448,6 @@ fi
 if [ $SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME = true ]
   then docker_compose_travis_yml_without_volumes 
 fi 
-
-
-#/////////////////////////////////////////////////////////////////////////////////////////////
-#######################
-## setters 
-#######################
-#/////////////////////////////////////////////////////////////////////////////////////////////
 
 if [ $SET_DOCKERFILE_CLERK_FRONTEND_WITH_VOLUME = true ]
   then clerk_frontend_dockerfile_with_volumes
@@ -1464,8 +1482,7 @@ if [ $SET_CLERK_FRONTEND_NGINX_CONF = true ]
 fi 
 
 #######################
-## M A I N
-#  docker build and run  starts here actually
+## BUILD 
 #######################
 
 
@@ -1475,15 +1492,17 @@ fi
 
 if [ $CMD_DOCKER_BUILD = true ]
    then  echo "PENDING   nice to have docker-compose messes up with bridged networking "
+fi
 
-
-#######################
-## M A I N shipping tot docker repository 
-#######################
 
 if [ ${DOCKER_TAG} = true ]
   then docker_tag
 fi 
+
+#######################
+## SHIP 
+#######################
+
 
 if [ ${DOCKER_PUSH} = true ]
   then 
@@ -1493,7 +1512,7 @@ if [ ${DOCKER_PUSH} = true ]
 
 
 #######################
-## MAIN  deploy to portal.azure.com  starts here
+## DEPLOY 
 #######################
 
 if [ $CREATE_AZ_DEPLOY_ACI_YAML = true  ]
@@ -1514,7 +1533,7 @@ if [ $AZ_RESOURCE_GROUP_DELETE = true ]
   delete_azure_resource_group
 fi 
 
-# az 
+
 if [ $AZ_RESOURCE_GROUP_CREATE = true  ]
 
   then 
@@ -1620,4 +1639,3 @@ clear
 #create_logfile_footer
 
 
-  
