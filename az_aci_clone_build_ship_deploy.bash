@@ -992,7 +992,7 @@ git init
 git config --global credential.helper store
 
 git config --global user.name "peter-bosch"
-git config --global user.name "ezahr"
+#git config --global user.name "ezahr"
 git config --global user.password "P...r\!yyyy"
 
 #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git
