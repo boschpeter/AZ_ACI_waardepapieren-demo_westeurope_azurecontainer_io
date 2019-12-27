@@ -70,13 +70,6 @@
 #    Set the environment variable CERT_HOST_IP is with an IP (or domain) that the validator app can use to reach the clerk-frontend container.  
 #   Ensure that the validator app runs on the same (wifi) network as the clerk frontend.
 
-##################################################################
-# Purpose: set FQDN    start of your FQDN in azure.
-# Arguments: discipl 
-# Return: https://discipl.westeurope.cloudapp.azure.com
-##################################################################
-#Z_DNSNAMELABEL=waardepapieren-demo 
-
 
 ##################################################################
 # Purpose: set FQDN  start of your FQDN in azure.
@@ -130,16 +123,22 @@ CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=localhost
 CMD_GIT_CLONE=false  
 
 #echo "#######################"
-#echo "## BUILD with docker-compose -f doc
-#echo "#######################" 
-#CMD_DOCKER_COMPOSE=false  #volumes and links depreciated
+#echo "##   docker system prune -a
+#echo "#######################"
+
 CMD_CONTAINER_STOP=false
 CMD_IMAGE_REMOVE=false
-
 CMD_CONTAINER_PRUNE=false
-CMD_DOCKER_COMPOSE_BUILD=
 
-" --build"
+#echo "#######################"
+#echo "## BUILD with docker-compose -f 
+#echo "#######################" 
+CMD_DOCKER_COMPOSE=false  #volumes and links depreciated
+CMD_DOCKER_COMPOSE_BUILD=" --build"
+
+#echo "#######################"
+#echo "## DOCKER BUILD 
+#echo "#######################"
 
 CMD_DOCKER_BUILD_MOCK_NLX=false    #docker_build_mock_nlx
 CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE=false #docker_build_waardepapieren_service
@@ -185,25 +184,23 @@ GITHUB_DIR=$PROJECT_DIR/${GIT_REPO}   #git clone https://github.com/ezahr/Waarde
 LOG_DIR=${GITHUB_DIR}/LOG_DIR
 LOG_FILE=${LOG_DIR}/LOG_${LOG_START_DATE_TIME}.log
 
-DOCKER_COMPOSE_DIR=${GITHUB_DIR}
-DOCKER_CLERK_FRONTEND_DIR=${GITHUB_DIR}/clerk-frontend
-DOCKER_WAARDEPAPIEREN_SERVICE_DIR=${GITHUB_DIR}/waardepapieren-service
-WAARDEPAPIEREN_SERVICE_CONFIG_DIR=${GITHUB_DIR}/waardepapieren-service/configuration
-DOCKER_MOCK_NLX_DIR=${GITHUB_DIR}/mock-nlx
 
 SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME=true       # mimic native Dockerfile build  #! no volumes , no links (bridged docker network)
 SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME=true  # mimic native Dockerfile build  #! no volumes , no links (bridged docker network)
 SET_DOCKERFILE_WAARDEPAPIEREN_WITHOUT_VOLUME=true  # mimic native Dockerfile build  #! no volumes , no links (bridged docker network)
+SET_DOCKERFILE_MOCK_NLX=true  
+
 SET_DOCKERCOMPOSE_TRAVIS_WITH_VOLUME=false         # bypass docker-compose depreciated and causes cloud / k8s issues
 SET_DOCKERFILE_CLERK_FRONTEND_WITH_VOLUME=false    # bypass docker-compose ACI cloud volume issue
 SET_DOCKERFILE_WAARDEPAPIEREN_WITH_VOLUME=false    # bypass docker-compose ACI cloud bridged network issus
+
 SET_CLERK_FRONTEND_NGINX_CONF=true
 SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE_TRAVIS_JSON=true
 SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE=true
 SET_WAARDEPAPIEREN_SERVICE_CONFIG=true
 
 #EPHEMERAL_RETENTION_TIME=86400  #24h 
-EPHEMERAL_RETENTION_TIME=25922712  #30 dage
+EPHEMERAL_RETENTION_TIME=2591228  #30 dage
 
 #echo "#######################"
 #echo "## feedbak 
@@ -225,7 +222,7 @@ DOUBLE_CHECK=true  #cat content modified files to ${LOG_DIR}
 docker_compose_travis_yml_with_volumes() {
 echo "- Running ... docker_compose_travis_yml_with_volumes"
 
-TT_DIRECTORY=${DOCKER_COMPOSE_DIR}
+TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=docker-compose-travis.yml 
 echo ${TT_DIRECTORY}.${TT_INSPECT_FILE}
 
@@ -300,7 +297,7 @@ echo "- Running ... docker_compose_travis_yml_without_volumes"
 #touch docker-compose-travis.yml 
 #mv docker-compose-travis.yml  docker-compose-travis_`date "+%Y%m%d-%H%M%S"`.yml
 
-TT_DIRECTORY=${DOCKER_COMPOSE_DIR}
+TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=docker-compose-travis.yml 
 echo ${TT_DIRECTORY}.${TT_INSPECT_FILE}
 
@@ -352,14 +349,14 @@ TT_INSPECT_FILE=""
 }
 
 ##################################################################
-# Purpose: hack into clerk-frontend Dockerfile
+# Purpose: set clerk-frontend Dockerfile
 # Arguments: 
 # Return: 
 ##################################################################
 clerk_frontend_dockerfile_with_volumes() {
 echo "- Running ... clerk_frontend_dockerfile_with_volumes"
 
-TT_DIRECTORY=${DOCKER_CLERK_FRONTEND_DIR}
+TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
 TT_INSPECT_FILE=Dockerfile 
 enter_touch
 
@@ -390,6 +387,36 @@ TT_INSPECT_FILE=""
 
 }
 
+
+##################################################################
+# Purpose: modify mock-nlx.Dockerfile
+# Arguments: 
+# Return: 
+##################################################################
+mock_nlx_dockerfile() {  
+
+echo "- Running ... mock_nlx_dockerfile"
+
+TT_DIRECTORY=${GITHUB_DIR}/mock-nlx
+TT_INSPECT_FILE=Dockerfile 
+enter_touch
+
+echo "FROM node:10
+RUN mkdir /app
+ADD index.js package.json package-lock.json /app/
+WORKDIR /app
+ENV TZ=Europe/Amsterdam
+RUN npm install --production" > ${TT_INSPECT_FILE} # Dockerfile
+
+if [ ${DOUBLE_CHECK} = true ]
+  then enter_inspect
+fi 
+
+TT_DIRECTORY=""
+TT_INSPECT_FILE=""
+
+}
+
 ##################################################################
 # Purpose: modify clerk-frontend.Dockerfile
 # Arguments: 
@@ -399,7 +426,7 @@ clerk_frontend_dockerfile_without_volumes() {
 
 echo "- Running ... clerk_frontend_dockerfile_without_volumes"
 
-TT_DIRECTORY=${DOCKER_CLERK_FRONTEND_DIR}
+TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
 TT_INSPECT_FILE=Dockerfile 
 enter_touch
 
@@ -448,7 +475,7 @@ clerk_frontend_nginx_conf() {
 
 echo "- Running ... clerk_frontend_nginx_conf"
 
-TT_DIRECTORY=${CLERK_FRONTEND_NGINX_DIR}
+TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
 TT_INSPECT_FILE=nginx.conf
 enter_touch
 
@@ -518,7 +545,7 @@ TT_INSPECT_FILE=""
 waardepapieren_service_dockerfile_with_volumes() {
 echo "- Running ... waardepapieren_service_dockerfile_with_volumes"
 
-TT_DIRECTORY=${DOCKER_WAARDEPAPIEREN_SERVICE_DIR}
+TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service
 TT_INSPECT_FILE=Dockerfile
 enter_touch
 
@@ -549,7 +576,7 @@ TT_INSPECT_FILE=""
 waardepapieren_service_dockerfile_without_volumes() {
 echo "- Running ... waardepapieren_service_dockerfile_without_volumes"
 
-TT_DIRECTORY=${DOCKER_WAARDEPAPIEREN_SERVICE_DIR}
+TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service
 TT_INSPECT_FILE=Dockerfile
 enter_touch
 
@@ -598,7 +625,7 @@ TT_INSPECT_FILE=""
 waardepapieren_service_config_compose_travis_json() {
 echo "- Running ... waardepapieren_service_config_compose_travis_json"
 
-TT_DIRECTORY=d
+TT_DIRECTORY==${GITHUB_DIR}/waardepapieren-service/configuration
 TT_INSPECT_FILE=waardepapieren-config-compose-travis.json
 enter_touch
 
@@ -643,7 +670,7 @@ TT_INSPECT_FILE=""
 waardepapieren_service_config_compose_json() {
 echo "- Running ... waardepapieren_service_config_compose_json"
 
-TT_DIRECTORY=$WAARDEPAPIEREN_SERVICE_CONFIG_DIR
+TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service/configuration
 TT_INSPECT_FILE=waardepapieren-config-compose.json
 enter_touch
 
@@ -687,7 +714,7 @@ TT_INSPECT_FILE=""
 waardepapieren_service_config_json() {
 echo "- Running ... waardepapieren_service_config_json"
 
-TT_DIRECTORY=$WAARDEPAPIEREN_SERVICE_CONFIG_DIR
+TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service/configuration
 TT_INSPECT_FILE=waardepapieren-config.json
 enter_touch
 
@@ -1042,8 +1069,8 @@ clear
 if [ -f "${TT_INSPECT_FILE}" ]; then
  
 create_logfile_header
+echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE  
 echo "| ${LOG_START_DATE_TIME} | ${TT_DIRECTORY} |"                                  >> $LOG_FILE
-echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE                             
 echo "<code>"                                                                        >> $LOG_FILE
 cat  ${TT_INSPECT_FILE}                                                              >> $LOG_FILE
 echo "</code>"                                                                       >> $LOG_FILE
@@ -1060,15 +1087,15 @@ if [ ${PROMPT} = true ]
 then 
 clear
 echo "========="
-echo "enter inspect  ${TT_DIRECTORY} "  
-echo "${TT_INSPECT_FILE}"
+echo "enter inspect : ${TT_INSPECT_FILE}"
+echo " ${TT_DIRECTORY} "  
 echo "========="
 echo ""
 cat  ${TT_INSPECT_FILE}
 echo ""
 echo "========="
-echo "eof inspect  ${TT_DIRECTORY} "
-echo  ${TT_INSPECT_FILE}
+echo "enter inspect : ${TT_INSPECT_FILE}"
+echo " ${TT_DIRECTORY} " 
 echo "========="
 enter_cont
 
@@ -1405,19 +1432,11 @@ echo "#######################"
 echo "## DOWNLOAD"  
 echo "#######################"
 echo "HOME_DIR="${HOME_DIR} 
+echo "PROJECT_DIR="${PROJECT_DIR}         #${HOME_DIR}/Projects/scratch/virtual-insanity       #git clone https://github.com/disciplo/waardepapieren.git
 echo "LOG_DIR="${LOG_DIR}  
 echo "LOG_FILE="${LOG_FILE}  
 echo "GITHUB_DIR="${GITHUB_DIR}        # ${HOME_DIR}/Dropbox/Github/Waardepapieren-AZURE-ACI  #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git 
-echo "PROJECT_DIR="${PROJECT_DIR}         #${HOME_DIR}/Projects/scratch/virtual-insanity       #git clone https://github.com/disciplo/waardepapieren.git
-enter_cont
-clear
-echo "DOCKER_COMPOSE_DIR="${DOCKER_COMPOSE_DIR}        #${HOME_DIR}/Projects/scratch/virtual-insanity/waardepapieren
-echo "DOCKER_CLERK_FRONTEND_DIR="${DOCKER_CLERK_FRONTEND_DIR}        #${HOME_DIR}/Projects/scratch/virtual-insanity/waardepapieren/clerk-frontend
-echo "CLERK_FRONTEND_NGINX_DIR="${CLERK_FRONTEND_NGINX_DIR}        #${DOCKER_CLERK_FRONTEND_DIR}/nginx
-#CLERK_FRONTEND_CYPRESS_DIR="$         #${DOCKER_CLERK_FRONTEND_DIR}/cypress
-echo "DOCKER_WAARDEPAPIEREN_SERVICE_DIR="${DOCKER_WAARDEPAPIEREN_SERVICE_DIR}        #${HOME_DIR}/Projects/scratch/virtual-insanity/waardepapieren/waardepapieren-service
-echo "WAARDEPAPIEREN_SERVICE_CONFIG_DIR="${WAARDEPAPIEREN_SERVICE_CONFIG_DIR}       #${DOCKER_WAARDEPAPIEREN_SERVICE_DIR}/configuration
-echo ""
+
 enter_cont
 clear
 echo "#######################"
@@ -1434,9 +1453,12 @@ clear
 echo "#######################"
 echo "## BUILD "
 echo "#######################" 
-echo "CMD_DOCKER_COMPOSE="$CMD_DOCKER_COMPOSE        #true  #volumes and links depreciated
-echo "CMD_DOCKER_BUILD="$CMD_DOCKER_BUILD         #false  # build by container
+echo "CMD_DOCKER_COMPOSE="$CMD_DOCKER_COMPOSE        #"docker-compose -f docker-compose-travis.yml up --build
 echo "CMD_DOCKER_COMPOSE_BUILD="$CMD_DOCKER_COMPOSE_BUILD        #" --build"
+echo ""
+echo "CMD_DOCKER_BUILD_MOCK_NLX"=$CMD_DOCKER_BUILD_MOCK_NLX
+echo "CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE"=$CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE
+echo "CMD_DOCKER_BUILD_CLERK_FRONTEND"=$CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE
 echo ""
 echo "SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME="$SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME         #true       
 echo "SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME="$SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME         #true
@@ -1445,11 +1467,11 @@ echo ""
 echo "SET_DOCKERCOMPOSE_TRAVIS_WITH_VOLUME="$SET_DOCKERCOMPOSE_TRAVIS_WITH_VOLUME        #false
 echo "SET_DOCKERFILE_CLERK_FRONTEND_WITH_VOLUME="$SET_DOCKERFILE_CLERK_FRONTEND_WITH_VOLUME        #false
 echo "SET_DOCKERFILE_WAARDEPAPIEREN_WITH_VOLUME="$SET_DOCKERFILE_WAARDEPAPIEREN_WITH_VOLUME        #false
+echo "SET_DOCKERFILE_MOCK_NLX"=$SET_DOCKERFILE_MOCK_NLX  
 echo ""
 echo "SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE_TRAVIS_JSON="$SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE_TRAVIS_JSON        #true 
 echo "SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE="$SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE        #true 
 echo "SET_WAARDEPAPIEREN_SERVICE="$SET_WAARDEPAPIEREN_SERVICE_CONFIG        #true 
-
 echo "SET_CLERK_FRONTEND_NGINX_CONF="$SET_CLERK_FRONTEND_NGINX_CONF        #true
 enter_cont
 clear
@@ -1539,6 +1561,10 @@ fi
 if [ $SET_DOCKERFILE_WAARDEPAPIEREN_WITHOUT_VOLUME = true ]
   then waardepapieren_service_dockerfile_without_volumes
 fi 
+
+if [ $SET_DOCKERFILE_MOCK_NLX  = true ]
+   then mock_nlx_dockerfile
+fi    
 
 if [ $SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE_TRAVIS_JSON = true ]
   then waardepapieren_service_config_compose_travis_json      
@@ -1630,9 +1656,6 @@ echo
 echo "hope the run will be ok!"
 echo
 enter_cont
-
-
-
 
 echo " cd back into " ${GITHUB_DIR}
 cd ${GITHUB_DIR}
