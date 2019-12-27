@@ -84,6 +84,7 @@
 # Return: https://waardepapieren-demo.westeurope.azurecontainer.io
 ##################################################################
 AZ_DNSNAMELABEL=waardepapieren-demo   #<<<FQDN first part goes here. s
+
 TIMEZONE="ENV TZ=Europe/Amsterdam"
 
 
@@ -105,6 +106,11 @@ fi
 
 CERT_HOST_IP=$AZ_DNSNAMELABEL.westeurope."$AZ_TLD"  #FQDN linux
 CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=$AZ_DNSNAMELABEL.westeurope.$AZ_TLD
+
+
+#tt overrule
+CERT_HOST_IP=localhost  #FQDN linux
+CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=localhost
 
 
 #echo "#######################"
@@ -156,9 +162,7 @@ AZ_RESOURCE_GROUP_CREATE=false
 
 CREATE_AZ_DEPLOY_ACI_YAML=true #@PROJECT_DIR deploy_aci.yml
 CMD_AZ_CREATE_CONTAINERGROUP=false  #.. jeuh - - Running ... ..
-
-#///
-
+CMD_AZ_RESTART_CONTAINERGROUP=false
 #echo "#######################"
 #echo "## DOWNLOAD / directories used 
 #echo "#######################" 
@@ -418,6 +422,7 @@ COPY --from=0 /app/build /usr/share/nginx/html
 #  volumes:
 #    - ./clerk-frontend/nginx/certs:/etc/nginx/certs:rw
 RUN mkdir /etc/nginx/certs
+RUN apt-get update && apt-get install -y iputils-ping
 ADD nginx/certs/org.crt /etc/nginx/certs/org.crt
 ADD nginx/certs/org.key /etc/nginx/certs/org.key"  > ${TT_INSPECT_FILE} # Dockerfile
 
@@ -1130,9 +1135,9 @@ docker build -t ${DOCKER_USER}/mock-nlx .
 # Arguments: docker build -t boscp08/     NB . periode means from this directory 
 # Return: 
 ##################################################################
-docker_build_waardepapieren_service()) {
+docker_build_waardepapieren_service()  {
 
-echo "- Running docker_build_mock_nlx( "
+echo "- Running docker_build_mock_nlx "
 
 cd ${GITHUB_DIR}/waardepapieren-service
 docker build -t ${DOCKER_USER}/waardepapieren-service .
