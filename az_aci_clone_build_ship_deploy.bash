@@ -144,6 +144,11 @@ CMD_DOCKER_BUILD_MOCK_NLX=false    #docker_build_mock_nlx
 CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE=false #docker_build_waardepapieren_service
 CMD_DOCKER_BUILD_CLERK_FRONTEND=false  #docker_build_clerk_frontend
 
+MOCK_NLX_IMAGE=waardepapieren_mock_nlx
+SERVICE_IMAGE=waardepapieren_service
+CLERK_FRONTEND_IMAGE=waardepapieren_clerk_frontend
+
+
 #echo "#######################"
 #echo "## DOCKER SHIP 
 #echo "#######################" 
@@ -768,7 +773,7 @@ properties:
   containers:
   - name: waardepapieren-mock-nlx
     properties:
-      image: $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG
+      image: $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG
       resources:
         requests:
           cpu: 1
@@ -777,7 +782,7 @@ properties:
       - port: 80
   - name: waardepapieren-service
     properties:
-      image: $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG
+      image: $DOCKER_USER/${SERVICE_IMAGE}:$DOCKER_VERSION_TAG
       resources:
         requests:
           cpu: 1
@@ -786,7 +791,7 @@ properties:
       - port: 3232
   - name: waardepapieren-clerk-frontend
     properties:
-      image: $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG
+      image: $DOCKER_USER/${CLERK_FRONTEND_IMAGE}:$DOCKER_VERSION_TAG
       resources:
         requests:
           cpu: 1
@@ -1162,7 +1167,13 @@ docker_build_mock_nlx() {
 echo "- Running docker_build_mock_nlx( "
 
 cd ${GITHUB_DIR}/mock-nlx
-docker build -t ${DOCKER_USER}/mock-nlx .
+docker build -t ${DOCKER_USER}/${MOCK_NLX_IMAGE} .
+
+docker tag $DOCKER_USER/${MOCK_NLX_IMAGE}:latest $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG 
+
+docker push $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG 
+
+cd ${GITHUB_DIR}
 
 }
 
@@ -1482,6 +1493,10 @@ echo "DOCKER_TAG="${DOCKER_TAG}        #true
 echo "DOCKER_USER="${DOCKER_USER}      #"boscp08"  #NB repository name must be lowercase
 echo "DOCKER_VERSION_TAG="${DOCKER_VERSION_TAG}       #"2.0"
 echo "DOCKER_PUSH="${DOCKER_PUSH}         #true  #hub.docker.com 
+echo "MOCK_NLX_IMAGE"=$MOCK_NLX_IMAGE #waardepapieren_mock_nlx
+echo "SERVICE_IMAGE="$SERVICE_IMAGE #waardepapieren_service
+echo "CLERK_FRONTEND_IMAGE="$CLERK_FRONTEND_IMAGE #waardepapieren_clerk_fronte
+
 echo ""
 echo "#######################"
 echo "## DEPLOY AZURE"
