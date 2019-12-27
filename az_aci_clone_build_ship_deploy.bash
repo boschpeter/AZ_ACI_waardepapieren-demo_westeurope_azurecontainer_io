@@ -1,5 +1,3 @@
-<code bash>
-
 #! /bin/bash
 # //////////////////////////////////////////////////////////////////////////////////////////
 #    File Type   :- BASH Script (needs docker-CLI and AZURE-CLI installed)
@@ -1622,4 +1620,4 @@ clear
 #create_logfile_footer
 
 
-</code>
+  
