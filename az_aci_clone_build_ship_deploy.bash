@@ -84,6 +84,8 @@
 # Return: https://waardepapieren-demo.westeurope.azurecontainer.io
 ##################################################################
 AZ_DNSNAMELABEL=waardepapieren-demo   #<<<FQDN first part goes here. s
+TIMEZONE="ENV TZ=Europe/Amsterdam"
+
 
 #TARGET_HOST=linux_VM
 TARGET_HOST=azure_container_instance
@@ -367,6 +369,7 @@ ADD public /app/public
 ADD src /app/src
 ARG CERTIFICATE_HOST
 ENV REACT_APP_CERTIFICATE_HOST=${CERTIFICATE_HOST}
+ENV TZ=Europe/Amsterdam
 RUN npm run build
 
 FROM nginx:1.15.8
@@ -406,6 +409,7 @@ ADD public /app/public
 ADD src /app/src
 ARG CERTIFICATE_HOST
 ENV REACT_APP_CERTIFICATE_HOST=http://${CERT_HOST_IP}:8880
+ENV TZ=Europe/Amsterdam
 RUN npm run build
 
 FROM nginx:1.15.8
@@ -515,6 +519,7 @@ ADD .babelrc package.json package-lock.json /app/
 ADD src/* app/src/
 ADD configuration/* app/configuration/
 ENV WAARDEPAPIEREN_CONFIG /app/configuration/waardepapieren-config.json
+ENV TZ=Europe/Amsterdam
 WORKDIR /app
 RUN npm install --production
 CMD npm start"  > ${TT_INSPECT_FILE} #Dockerfile
@@ -560,6 +565,7 @@ ADD configuration/waardepapieren-config-compose.json /app/configuration
 ADD configuration/waardepapieren-config-compose-travis.json /app/configuration
 ADD configuration/waardepapieren-config.json /app/configuration
 ENV WAARDEPAPIEREN_CONFIG /app/configuration/waardepapieren-config.json
+ENV TZ=Europe/Amsterdam
 
 RUN npm install --production
 CMD npm start"  > ${TT_INSPECT_FILE} #Dockerfile
