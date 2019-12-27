@@ -25,7 +25,7 @@
 #Ik had wel hier problemen met de ICTU firewall die het blokkeerde, ik moest met mijn telefoon op 4g om het werkend te krijgen
 
 
-#https://waardepapieren-demo.discipl.org/
+#https://waardepapieren-demo.discipl.org/    BSN=663678651
 #https://waardepapieren-demo.westeurope.cloudapp.azure.com  VM
 #https://waardepapieren-demo.westeurope.azurecontainer.io ACI
 
@@ -83,7 +83,7 @@
 # Arguments: waardepapieren-demo
 # Return: https://waardepapieren-demo.westeurope.azurecontainer.io
 ##################################################################
-AZ_DNSNAMELABEL=waardepapieren-demo
+AZ_DNSNAMELABEL=waardepapieren-demo   #<<<FQDN first part goes here. s
 
 #TARGET_HOST=linux_VM
 TARGET_HOST=azure_container_instance
@@ -122,15 +122,20 @@ CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=$AZ_DNSNAMELABEL.westeurope.$AZ_TLD
 CMD_GIT_CLONE=false  
 
 #echo "#######################"
-#echo "## BUILD
+#echo "## BUILD with docker-compose -f doc
 #echo "#######################" 
 #CMD_DOCKER_COMPOSE=false  #volumes and links depreciated
 CMD_CONTAINER_STOP=false
 CMD_IMAGE_REMOVE=false
-CMD_CONTAINER_PRUNE=false
 
-CMD_DOCKER_COMPOSE_BUILD=" --build"
-CMD_DOCKER_BUILD=false  # build by container PENDING  
+CMD_CONTAINER_PRUNE=false
+CMD_DOCKER_COMPOSE_BUILD=
+
+" --build"
+
+CMD_DOCKER_BUILD_MOCK_NLX=false    #docker_build_mock_nlx
+CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE=false #docker_build_waardepapieren_service
+CMD_DOCKER_BUILD_CLERK_FRONTEND=false  #docker_build_clerk_frontend
 
 #echo "#######################"
 #echo "## DOCKER SHIP 
@@ -150,7 +155,7 @@ AZ_RESOURCE_GROUP_CREATE=false
 CREATE_AZ_DEPLOY_ACI_YAML=true #@PROJECT_DIR deploy_aci.yml
 CMD_AZ_CREATE_CONTAINERGROUP=false  #.. jeuh - - Running ... ..
 
-#////////////////////////////////////////////////////////////////////
+#///
 
 #echo "#######################"
 #echo "## DOWNLOAD / directories used 
@@ -624,8 +629,6 @@ TT_DIRECTORY=$WAARDEPAPIEREN_SERVICE_CONFIG_DIR
 TT_INSPECT_FILE=waardepapieren-config-compose.json
 enter_touch
 
-
-
 echo " {
    \"EPHEMERAL_ENDPOINT\" : \"https://${CERT_HOST_IP}:3232\",
    \"EPHEMERAL_WEBSOCKET_ENDPOINT\" : \"wss://${CERT_HOST_IP}:3232\",
@@ -770,7 +773,6 @@ fi
 TT_DIRECTORY=""
 TT_INSPECT_FILE=""
 
-
 }
 
 #'# Structured programming:
@@ -785,8 +787,7 @@ enter_cont() {
     read
 }
 
-
-##################################################################
+#################################################
 # Purpose: Procedure concurrent version system
 # Arguments: 
 # Return: 
@@ -800,10 +801,9 @@ git init
 git config --global credential.helper store
 git config --global user.email "bosch.peter@icloud.com"
 git config --global user.name "BoschPeter"
-git config --global user.password "Peter\!2020"
+git config --global user.password "Peter\!..."
 
 }
-
 
 ##################################################################
 # Purpose: Procedure to clone de github repo on your pc
@@ -824,7 +824,6 @@ git_clone() {
  
 }
 
-
 # /////////////////////////////////////////////////////////////////////////////////
 #  Create a Header in the logfile
 # /////////////////////////////////////////////////////////////////////////////////
@@ -842,7 +841,6 @@ create_logfile_footer() {
     echo $JOB_END_DATE_TIME - END JOB :                                                >> $LOG_FILE
     echo ----------------------------------------------------------------------------- >> $LOG_FILE
     }
-
 
 ##################################################################
 # Purpose: Procedure to create directories specified
@@ -898,9 +896,7 @@ touch ${TT_INSPECT_FILE}
 
 }
 
-
-
-#/////////////////////////////////////////////////////////////////
+#
 ##################################################################
 # Purpose: DOWNLOAD
 ##################################################################
@@ -943,12 +939,11 @@ curl -sL https://packages.microsoft.com/keys/microsoft.asc |
     sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
 
 #windows
-#[https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest|win10powershell-admin!]]  
-#<code>Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait   </code>  |
+
 
 }
 
-#/////////////////////////////////////////////////////////////////
+#
 ##################################################################
 # Purpose: CLONE   
 ##################################################################
@@ -997,11 +992,13 @@ git config --global user.password "Peter\!2020"
 
 
 
-#/////////////////////////////////////////////////////////////////
+
+
+#
 ##################################################################
 # Purpose: BUILD
 ##################################################################
-#/////////////////////////////////////////////////////////////////
+#
 
 
 ##################################################################
@@ -1029,9 +1026,9 @@ if [ -f "${TT_INSPECT_FILE}" ]; then
 create_logfile_header
 echo "| ${LOG_START_DATE_TIME} | ${TT_DIRECTORY} |"                                  >> $LOG_FILE
 echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE
-echo "<code>"                                                                      >> $LOG_FILE
-cat  ${TT_INSPECT_FILE}                                                            >> $LOG_FILE
-echo "</code>"                                                                     >> $LOG_FILE
+echo "<code>"                                                                        >> $LOG_FILE
+cat  ${TT_INSPECT_FILE}                                                              >> $LOG_FILE
+echo "</code>"                                                                       >> $LOG_FILE
 create_logfile_footer
 
 else 
@@ -1109,6 +1106,49 @@ docker-compose -f docker-compose-travis.yml up $CMD_DOCKER_COMPOSE_BUILD
 }
 
 ##################################################################
+# Purpose:  Procedure to build the mock-nlx image
+# Arguments: docker build -t boscp08/     NB . periode means from this directory 
+# Return: 
+##################################################################
+docker_build_mock_nlx() {
+
+echo "- Running docker_build_mock_nlx( "
+
+cd ${GITHUB_DIR}/mock-nlx
+docker build -t ${DOCKER_USER}/mock-nlx .
+
+}
+
+##################################################################
+# Purpose:  Procedure to build waardepapieren-service image
+# Arguments: docker build -t boscp08/     NB . periode means from this directory 
+# Return: 
+##################################################################
+docker_build_waardepapieren_service()) {
+
+echo "- Running docker_build_mock_nlx( "
+
+cd ${GITHUB_DIR}/waardepapieren-service
+docker build -t ${DOCKER_USER}/waardepapieren-service .
+
+}
+
+##################################################################
+# Purpose:  Procedure to build the waardepapieren images and run containers.  
+# Arguments: docker build -t boscp08/     NB . periode means from this directory 
+# Return: 
+##################################################################
+docker_build_clerk_frontend() {
+
+echo "- Running docker_build_clerk-frontend( "
+
+cd ${GITHUB_DIR}/clerk-frontend
+docker build -t ${DOCKER_USER}/clerk-frontend .
+
+}
+
+
+##################################################################
 # Purpose: Procedure to tag docker images (Version)
 # Arguments: 
 # Return: 
@@ -1119,13 +1159,13 @@ clear
 #enter_cont
 
 create_logfile_header
-echo "- Running ... docker_tag"
-echo "- Running ... docker_tag"  >> $LOG_FILE
-docker tag waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG  
-docker tag waardepapieren_waardepapieren-service $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG 
-docker tag waardepapieren_mock-nlx $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG          
+echo "- Running ... docker_tag :latest  $DOCKER_VERSION_TAG"
+echo "- Running ... docker_tag"                                                >> $LOG_FILE
+docker tag waardepapieren_clerk-frontend:latest $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG  
+docker tag waardepapieren_waardepapieren-service:latest  $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG 
+docker tag waardepapieren_mock-nlx:latest $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG          
 
-docker images | grep  $DOCKER_VERSION_TAG   >> $LOG_FILE
+docker images | grep  $DOCKER_VERSION_TAG                                      >> $LOG_FILE
 
 create_logfile_footer
 docker images | grep  $DOCKER_VERSION_TAG   
@@ -1133,11 +1173,11 @@ enter_cont
 
 }
 
-#/////////////////////////////////////////////////////////////////
+#
 ##################################################################
 # Purpose: Ship to docker registry docker.hub.com
 ##################################################################
-#/////////////////////////////////////////////////////////////////
+#
 
 ##################################################################
 # Purpose: Procedure to tag docker images (Version)
@@ -1150,11 +1190,11 @@ clear
 #enter_cont
 
 create_logfile_header
-echo "- Running ... docker_tag"
-echo "- Running ... docker_tag"  >> $LOG_FILE
-docker tag waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG  
-docker tag waardepapieren_waardepapieren-service $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG 
-docker tag waardepapieren_mock-nlx $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG          
+echo "- Running ... docker_commit"
+echo "- Running ... docker_commit"                                    >> $LOG_FILE
+docker commit waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG  
+docker commit  waardepapieren_waardepapieren-service $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG 
+docker commit  waardepapieren_mock-nlx $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG          
 
 docker images | grep  $DOCKER_VERSION_TAG   >> $LOG_FILE
 
@@ -1209,14 +1249,14 @@ fi
 
 }
 
-#/////////////////////////////////////////////////////////////////
+#
 ##################################################################
 # Purpose: DEPLOY on AZURE 
 ##################################################################
-#/////////////////////////////////////////////////////////////////
+#
 
 ##################################################################
-# Purpose: Procedure to create azure resource group
+# Purpose: Procedure to create azure resource group aka costcenter/root
 # Arguments: 
 # Return: 
 ##################################################################
@@ -1235,9 +1275,10 @@ az group create --name ${AZ_RESOURCE_GROUP} --location westeurope
 ##################################################################
 delete_azure_resource_group() {
  echo "- Running ... delete_azure_resource_group"
- # $AZ_RESOURCE_GROUP="Discipl_Wigo4it_DockerGroup4"
- # echo sure ? delete $AZ_RESOURCE_GROUP
- # enter_cont
+ echo "***  You are about to delete resource group ${AZ_RESOURCE_GROUP}"
+  echo "***" 
+  echo "az login succeeded ?" 
+  enter_cont
 az group delete --name ${AZ_RESOURCE_GROUP}
 }
 
@@ -1248,8 +1289,15 @@ az group delete --name ${AZ_RESOURCE_GROUP}
 ##################################################################
 create_azure_container_group() {
 echo "- Running ... create_azure_container_group" 
+  #az login
+  echo "***"   
+  echo "***  Welcome to  create_azure_resource_group"
+  echo "***"   
+  echo "***" 
+  echo "***  You are about to create resource group $AZ_RESOURCE_GROUP"
+  echo "***" 
+  echo "az login succeeded ?"
 cd ${PROJECT_DIR}
-
 az container create --resource-group ${AZ_RESOURCE_GROUP} --file deploy-aci.yaml
 # https://docs.microsoft.com/en-us/azure/container-instances/container-instances-multi-container-yaml
 # View deployment state
@@ -1265,7 +1313,6 @@ az container create --resource-group ${AZ_RESOURCE_GROUP} --file deploy-aci.yaml
 restart_azure_container_group() {
 echo "- Running ... create_azure_container_group" 
 cd ${PROJECT_DIR}
-
 az container restart --resource-group ${AZ_RESOURCE_GROUP} 
 
 }
@@ -1297,12 +1344,12 @@ echo "</code>"                                                               >> 
 
 
 
-#/////////////////////////////////////////////////////////////////////////////////////////////
+
 #######################
 ## M A I N
 # program starts here actually  
 #######################
-#/////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 echo "***"   
@@ -1435,11 +1482,11 @@ create_logdir
 
 create_directories
 
-#/////////////////////////////////////////////////////////////////////////////////////////////
+#
 #######################
 ## SET 
 #######################
-#/////////////////////////////////////////////////////////////////////////////////////////////
+#
 
 if [ $SET_DOCKERCOMPOSE_TRAVIS_WITH_VOLUME = true ]
   then docker_compose_travis_yml_with_volumes
@@ -1482,7 +1529,7 @@ if [ $SET_CLERK_FRONTEND_NGINX_CONF = true ]
 fi 
 
 #######################
-## BUILD 
+## BUILD  with docker-compose  depreciated
 #######################
 
 
@@ -1490,10 +1537,21 @@ if [ $CMD_DOCKER_COMPOSE = true ]
   then docker_compose_min_f_docker-travis_compose_yml_up # 
 fi 
 
-if [ $CMD_DOCKER_BUILD = true ]
-   then  echo "PENDING   nice to have docker-compose messes up with bridged networking "
+#######################
+## BUILD  with docker native 
+#######################
+
+if [ $CMD_DOCKER_BUILD_MOCK_NLX = true ]
+  then  docker_build_mock_nlx
 fi
 
+if [ $CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE = true ]
+   then  docker_build_waardepapieren_service
+fi
+
+if [ $CMD_DOCKER_BUILD_CLERK_FRONTEND = true ]
+   then  docker_build_clerk_frontend
+fi
 
 if [ ${DOCKER_TAG} = true ]
   then docker_tag
@@ -1502,7 +1560,6 @@ fi
 #######################
 ## SHIP 
 #######################
-
 
 if [ ${DOCKER_PUSH} = true ]
   then 
@@ -1521,45 +1578,16 @@ fi
 
 if [ $AZ_RESOURCE_GROUP_DELETE = true ]
   then 
-  #az login\
-  echo "***"   
-  echo "***  Welcome to    delete_azure_resource_group"
-  echo "***"   
-  echo "***" 
-  echo "***  You are about to delete resource group ${AZ_RESOURCE_GROUP}"
-  echo "***" 
-  echo "az login succeeded ?" 
-  enter_cont
   delete_azure_resource_group
 fi 
 
-
 if [ $AZ_RESOURCE_GROUP_CREATE = true  ]
-
-  then 
-  #az login
-  echo "***"   
-  echo "***  Welcome to  create_azure_resource_group"
-  echo "***"   
-  echo "***" 
-  echo "***  You are about to create resource group $AZ_RESOURCE_GROUP"
-  echo "***" 
-  echo "az login succeeded ?" 
+  then  
     create_azure_resource_group
 fi 
 
 if [ $CMD_AZ_CREATE_CONTAINERGROUP = true ]
   then 
-  #az logon
-  echo "***"   
-  echo "***  Welcome to  create_azure_container_group "
-  echo "***"   
-  echo "***" 
-  echo "***  You are about to deploy waardepapieren images fromdockerhub to ACI AZURE Container Instances "
-  echo "***  droplet-targethost= https://${CERT_HOST_IP}  with DOCKER_VERSION_TAG = ${DOCKER_VERSION_TAG}"
-  echo "***  resourcegroup = ${AZ_RESOURCE_GROUP} "
-  echo "az login succeeded ?" 
-  #enter_cont
   create_azure_container_group   #blader naar portal.azure.com  bosch.peter@outlook.com 0l....n
 fi 
 
