@@ -967,10 +967,10 @@ git config user.name "BoschPeter"
 git config --global user.email "bosch.peter@icloud.com"
 git config --global user.name "boschpeter"
 
-git config --global user.password "Peter\!2020"
+git config --global user.password "Peter\....ß"
 
 # git config --global user.name "ezahr"
-git config --global user.password "Peter\!2020"
+
 
 #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git
 #cd into 
@@ -1453,6 +1453,14 @@ echo "CMD_AZ_CREATE_CONTAINERGROUP="$CMD_AZ_CREATE_CONTAINERGROUP        #true  
 #echo "#######################"
 #echo "## end of feedbak 
 #echo "#######################" 
+
+if [ ${PROMPT} = true ] 
+ then 
+ cd ${GITHUB_DIR}
+ write_az_clone_build_ship_deploy_bash
+ # cat $LOG_FILE | more
+ fi 
+
 echo "" 
 echo "" 
 clear
@@ -1538,7 +1546,7 @@ if [ $CMD_DOCKER_COMPOSE = true ]
 fi 
 
 #######################
-## BUILD  with docker native 
+## BUILD  docker native 
 #######################
 
 if [ $CMD_DOCKER_BUILD_MOCK_NLX = true ]
@@ -1591,6 +1599,10 @@ if [ $CMD_AZ_CREATE_CONTAINERGROUP = true ]
   create_azure_container_group   #blader naar portal.azure.com  bosch.peter@outlook.com 0l....n
 fi 
 
+if [ $CMD_AZ_RESTART_CONTAINERGROUP = true ]
+  then 
+  restart_azure_container_group   #pull from docker hub blader naar portal.azure.com  bosch.peter@outlook.com 0l....n
+fi 
 
 create_logfile_footer
 
@@ -1600,12 +1612,7 @@ echo
 enter_cont
 
 
-if [ ${PROMPT} = true ] 
- then 
- cd ${GITHUB_DIR}
- write_az_clone_build_ship_deploy_bash
- cat $LOG_FILE | more
- fi 
+
 
 echo " cd back into " ${GITHUB_DIR}
 cd ${GITHUB_DIR}
