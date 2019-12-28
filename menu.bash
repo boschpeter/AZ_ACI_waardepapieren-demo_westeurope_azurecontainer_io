@@ -39,7 +39,8 @@ show_menus() {
     echo "13..) create_azure_container_group $AZ_RESOURCE_GROUP"
     echo "14..) restart_azure_container_group $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
 	echo "15. backup scripts"
-	echo "16 Exit"
+	echo "16. the whole sjebang"
+	echo "17 Exit"
 }
 # read input from the keyboard and take a action
 # invoke the one() when the user select 1 from the menu option.
@@ -47,7 +48,7 @@ show_menus() {
 # Exit when user the user select 3 form the menu option.
 read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 15] " choice
+	read -p "Enter choice [ 1 - 17] " choice
 	case $choice in
 		1) docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  ;;
         2) docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  ;;
@@ -64,7 +65,8 @@ read_options(){
         13) create_azure_container_group ;;
         14) restart_azure_container_group ;;
         15) write_az_clone_build_ship_deploy_bash ;;
-		16) exit 0;;
+		16) sjebang ;;
+		17) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
 }

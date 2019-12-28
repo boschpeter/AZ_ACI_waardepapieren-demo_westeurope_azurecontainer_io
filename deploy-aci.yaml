@@ -1,28 +1,28 @@
 location: westeurope
-name: Waardepapieren_demo_ACI_1
+name: Discipl_Wigo4it_DockerGroup
 properties:
   containers:
-  - name: waardepapieren_mock_nlx
+  - name: waardepapieren-mock-nlx
     properties:
-      image: boscp08/waardepapieren_mock_nlx:1.0
+      image: boscp08/waardepapieren-mock-nlx:1.0
       resources:
         requests:
           cpu: 1
           memoryInGb: 0.5
       ports:
       - port: 80
-  - name: waardepapieren_service
+  - name: waardepapieren-service
     properties:
-      image: boscp08/waardepapieren_service:1.0
+      image: boscp08/waardepapieren-service:1.0
       resources:
         requests:
           cpu: 1
           memoryInGb: 0.5
       ports:
       - port: 3232
-  - name: waardepapieren_clerk_frontend
+  - name: waardepapieren-clerk-frontend
     properties:
-      image: boscp08/waardepapieren_clerk_frontend:1.0
+      image: boscp08/waardepapieren-clerk-frontend:1.0
       resources:
         requests:
           cpu: 1

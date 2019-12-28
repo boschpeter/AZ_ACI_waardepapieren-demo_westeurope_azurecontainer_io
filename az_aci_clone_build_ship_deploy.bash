@@ -161,7 +161,7 @@ DOCKER_PUSH=true #hub.docker.com   NB with docker commit you loose ENV
 #echo "#######################"
 #echo "## AZURE DEPLOY
 #echo "#######################" 
-AZ_RESOURCE_GROUP="Discipl_Wigo4it_DockerGroup"  #waardepapierenVM
+AZ_RESOURCE_GROUP="Discipl_Wigo4it_ACI"  #waardepapierenVM
 CMD_AZ_RESOURCE_GROUP_DELETE=false
 CMD_AZ_RESOURCE_GROUP_CREATE=false
 
@@ -1218,6 +1218,19 @@ fi
 cd ${GITHUB_DIR}
 
 
+}
+
+sjebang() {
+write_az_clone_build_ship_deploy_bash   
+docker_system_prune -a 
+docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+az login -u bosch.peter@outlook.com -p 0lifanten 
+delete_azure_resource_group  
+create_azure_resource_group  
+create_azure_container_group 
+#    14) restart_azure_container_group ;;
 }
 
 ##################################################################
