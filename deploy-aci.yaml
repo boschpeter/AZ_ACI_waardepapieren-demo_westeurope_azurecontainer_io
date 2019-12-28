@@ -1,0 +1,48 @@
+location: westeurope
+name: Waardepapieren_demo_ACI_1
+properties:
+  containers:
+  - name: waardepapieren_mock_nlx
+    properties:
+      image: boscp08/waardepapieren_mock_nlx:1.0
+      resources:
+        requests:
+          cpu: 1
+          memoryInGb: 0.5
+      ports:
+      - port: 80
+  - name: waardepapieren_service:
+    properties:
+      image: boscp08/waardepapieren_service:1.0
+      resources:
+        requests:
+          cpu: 1
+          memoryInGb: 0.5
+      ports:
+      - port: 3232
+  - name: waardepapieren_clerk_frontend
+    properties:
+      image: boscp08/waardepapieren_clerk_frontend:1.0
+      resources:
+        requests:
+          cpu: 1
+          memoryInGb: 0.5
+      ports:
+      - port: 443
+      - port: 8880
+  osType: Linux
+  ipAddress:
+    type: Public
+    # fqdn wordt: discipl_waardepapieren.westeurope.azurecontainer.io
+    dnsNameLabel: waardepapieren-demo 
+    ports:
+    - protocol: tcp
+      port: '443' 
+    - protocol: tcp
+      port: '3232' 
+    - protocol: tcp
+      port: '80'    
+    - protocol: tcp
+      port: '8880'      
+tags: null
+type: Microsoft.ContainerInstance/containerGroups
