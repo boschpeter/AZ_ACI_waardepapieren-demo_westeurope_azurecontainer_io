@@ -1070,6 +1070,7 @@ clear
 if [ -f "${TT_INSPECT_FILE}" ]; then
  
 create_logfile_header
+
 echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE  
 echo "| ${LOG_START_DATE_TIME} | ${TT_DIRECTORY} |"                                  >> $LOG_FILE
 echo "<code>"                                                                        >> $LOG_FILE
@@ -1087,16 +1088,24 @@ fi
 if [ ${PROMPT} = true ] 
 then 
 clear
-echo "========="
-echo "enter inspect : ${TT_INSPECT_FILE}"
-echo " ${TT_DIRECTORY} "  
-echo "========="
-echo ""
-cat  ${TT_INSPECT_FILE}
+
 echo ""
 echo "========="
-echo "enter inspect : ${TT_INSPECT_FILE}"
-echo " ${TT_DIRECTORY} " 
+pathname=${TT_DIRECTORY}
+echo "enter inspect : ${TT_INSPECT_FILE} " 
+echo "folder   =$(basename $pathname) "
+echo "git-repo =$(basename $(dirname $pathname)) "
+echo "project  =$(basename $(dirname $(dirname $pathname))) "
+echo "========="
+echo ""
+cat  ${TT_INSPECT_FILE} | more
+echo ""
+echo "========="
+pathname=${TT_DIRECTORY}
+echo "enter inspect : ${TT_INSPECT_FILE} " 
+echo "folder = $(basename $pathname) "
+echo "git-repo=$(basename $(dirname $pathname)) "
+echo "project=$(basename $(dirname $(dirname $pathname))) "
 echo "========="
 enter_cont
 
@@ -1168,17 +1177,14 @@ docker_build_image() {
   echo "- Running docker_build_image dir=$1 => $2/$2:$3  "
 
 cd ${GITHUB_DIR}/$1
-
-if [ ${DOCKER_BUILD} = true ]
-  then docker build -t $2/$3 .  #mind the dot!
-fi
+docker build -t $2/$3 .  #mind the dot!
 
 if [ ${DOCKER_TAG} = true ]
-docker tag $2/$3:latest $2/$3:$4
+then docker tag $2/$3:latest $2/$3:$4
 fi
 
-if [ ${DOCKER_PUSH} = true }
-docker push $2/$3:$4
+if [ ${DOCKER_PUSH} = true ]
+then docker push $2/$3:$4
 fi
 
 cd ${GITHUB_DIR}
