@@ -152,6 +152,7 @@ CLERK_FRONTEND_IMAGE=waardepapieren_clerk_frontend
 #echo "#######################"
 #echo "## DOCKER SHIP 
 #echo "#######################" 
+DOCKER_BUILD=false
 DOCKER_TAG=false   
 DOCKER_USER="boscp08"  #NB repository name must be lowercase
 DOCKER_VERSION_TAG="1.0"
@@ -773,7 +774,7 @@ properties:
   containers:
   - name: ${MOCK_NLX_IMAGE}
     properties:
-      image: $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG
+      image: ${DOCKER_USER}/${MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}
       resources:
         requests:
           cpu: 1
@@ -782,7 +783,7 @@ properties:
       - port: 80
   - name: ${SERVICE_IMAGE}:
     properties:
-      image: $DOCKER_USER/${SERVICE_IMAGE}:$DOCKER_VERSION_TAG
+      image: ${DOCKER_USER}/${SERVICE_IMAGE}:${DOCKER_VERSION_TAG}
       resources:
         requests:
           cpu: 1
@@ -791,7 +792,7 @@ properties:
       - port: 3232
   - name: ${CLERK_FRONTEND_IMAGE}
     properties:
-      image: $DOCKER_USER/${CLERK_FRONTEND_IMAGE}:$DOCKER_VERSION_TAG
+      image: ${DOCKER_USER}/${CLERK_FRONTEND_IMAGE}:${DOCKER_VERSION_TAG}
       resources:
         requests:
           cpu: 1
@@ -844,8 +845,8 @@ enter_cont() {
 ##################################################################
 
 git_init() {
-a
-cd $GITHUB_DIRa
+
+cd $GITHUB_DIR
 git init
 #Initialized empty Git repository in /home/boscp08/Dropbox/Github/.git/
 git config --global credential.helper store
@@ -1157,25 +1158,39 @@ docker-compose -f docker-compose-travis.yml up $CMD_DOCKER_COMPOSE_BUILD
 
 }
 
-##################################################################
+#################################################################
 # Purpose:  Procedure to build the mock-nlx image
-# Arguments: docker build -t boscp08/     NB . periode means from this directory 
-# Return: 
+# Arguments: docker_build_image mock-nlx boscp08 waardepapieren_mock_nlx 1.0 
+# Return: image
 ##################################################################
-docker_build_mock_nlx() {
 
-echo "- Running docker_build_mock_nlx( "
 
-cd ${GITHUB_DIR}/mock-nlx
-docker build -t ${DOCKER_USER}/${MOCK_NLX_IMAGE} .
+docker_build_image() {
+  arg1=$1 #mock-nlx
+  arg1=$2 #${DOCKER_USER}
+  arg2=$3 #${MOCK_NLX_IMAGE}
+  arg3=$4 #${DOCKER_VERSION_TAG}
+  echo "- Running docker_build_image dir=$1 => $2/$2:$3  "
 
-docker tag $DOCKER_USER/${MOCK_NLX_IMAGE}:latest $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG 
+cd ${GITHUB_DIR}/$1
 
-docker push $DOCKER_USER/${MOCK_NLX_IMAGE}:$DOCKER_VERSION_TAG 
+if [ ${DOCKER_BUILD} = true ]
+  then docker build -t $2/$3 .  #mind the dot!
+fi
+
+if [ ${DOCKER_TAG} = true ]
+docker tag $2/$3:latest $2/$3:$4
+fi
+
+if [ ${DOCKER_PUSH} = true }
+docker push $2/$3:$4
+fi
 
 cd ${GITHUB_DIR}
 
+
 }
+
 
 ##################################################################
 # Purpose:  Procedure to build waardepapieren-service image
@@ -1217,16 +1232,16 @@ clear
 #enter_cont
 
 create_logfile_header
-echo "- Running ... docker_tag :latest  $DOCKER_VERSION_TAG"
+echo "- Running ... docker_tag :latest  ${DOCKER_VERSION_TAG}"
 echo "- Running ... docker_tag"                                                >> $LOG_FILE
-docker tag waardepapieren_clerk-frontend:latest $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG  
-docker tag waardepapieren_waardepapieren-service:latest  $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG 
-docker tag waardepapieren_mock-nlx:latest $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG          
+docker tag waardepapieren_clerk-frontend:latest ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG}  
+docker tag waardepapieren_waardepapieren-service:latest  ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG} 
+docker tag waardepapieren_mock-nlx:latest ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}          
 
-docker images | grep  $DOCKER_VERSION_TAG                                      >> $LOG_FILE
+docker images | grep  ${DOCKER_VERSION_TAG}                                      >> $LOG_FILE
 
 create_logfile_footer
-docker images | grep  $DOCKER_VERSION_TAG   
+docker images | grep  ${DOCKER_VERSION_TAG}   
 enter_cont
 
 }
@@ -1250,14 +1265,14 @@ clear
 create_logfile_header
 echo "- Running ... docker_commit"
 echo "- Running ... docker_commit"                                    >> $LOG_FILE
-docker commit waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG  
-docker commit  waardepapieren_waardepapieren-service $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG 
-docker commit  waardepapieren_mock-nlx $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG          
+docker commit waardepapieren_clerk-frontend ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG}  
+docker commit  waardepapieren_waardepapieren-service ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG} 
+docker commit  waardepapieren_mock-nlx ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}          
 
-docker images | grep  $DOCKER_VERSION_TAG   >> $LOG_FILE
+docker images | grep  ${DOCKER_VERSION_TAG}   >> $LOG_FILE
 
 create_logfile_footer
-docker images | grep  $DOCKER_VERSION_TAG   
+docker images | grep  ${DOCKER_VERSION_TAG}   
 enter_cont
 
 
@@ -1274,33 +1289,33 @@ echo "Docker login"
 docker login
 create_logfile_header
 echo "- Running ... docker_push "
-echo "docker push $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG "        >> $LOG_FILE
-echo "docker push $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG " 
+echo "docker push ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG} "        >> $LOG_FILE
+echo "docker push ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG} " 
 echo "https://hub.docker.com/repository/docker/boscp08/wwaardepapieren-clerk-frontend"    >> $LOG_FILE
-docker push $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG                >> $LOG_FILE
+docker push ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG}                >> $LOG_FILE
 create_logfile_footer
 
 create_logfile_header
-echo "docker push $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG "              >> $LOG_FILE   
-echo "docker push $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG "     
+echo "docker push ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG} "              >> $LOG_FILE   
+echo "docker push ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG} "     
 echo "https://hub.docker.com/repository/docker/boscp08/waardepapieren-service"           >> $LOG_FILE
-docker push $DOCKER_USER/waardepapieren-service:$DOCKER_VERSION_TAG                      >> $LOG_FILE   
+docker push ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG}                      >> $LOG_FILE   
 create_logfile_footer
 
 create_logfile_header
-echo "docker push $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG"         >> $LOG_FILE
-echo "docker push $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG"      
+echo "docker push ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}"         >> $LOG_FILE
+echo "docker push ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}"      
 echo "https://hub.docker.com/repository/docker/boscp08/wwaardepapieren-mock-nlx"    >> $LOG_FILE
-docker push $DOCKER_USER/waardepapieren-mock-nlx:$DOCKER_VERSION_TAG                >> $LOG_FILE
+docker push ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}                >> $LOG_FILE
 create_logfile_footer
 
 if [ ${PROMPT} = true ] 
  then 
 echo "shipping to docker hub is done LOG_FILE= $LOG_FILE  "
-echo "or goto  https://hub.docker.com  docker-user=$DOCKER_USER with version=$DOCKER_VERSION_TAG  "
-echo "https://hub.docker.com/repository/docker/$DOCKER_USER//wwaardepapieren-clerk-frontend"   
-echo "https://hub.docker.com/repository/docker/$DOCKER_USER//waardepapieren-service"  
-echo "https://hub.docker.com/repository/docker/$DOCKER_USER//wwaardepapieren-mock-nlx"    
+echo "or goto  https://hub.docker.com  docker-user=${DOCKER_USER} with version=${DOCKER_VERSION_TAG}  "
+echo "https://hub.docker.com/repository/docker/${DOCKER_USER}//wwaardepapieren-clerk-frontend"   
+echo "https://hub.docker.com/repository/docker/${DOCKER_USER}//waardepapieren-service"  
+echo "https://hub.docker.com/repository/docker/${DOCKER_USER}//wwaardepapieren-mock-nlx"    
 # blader naar https://hub.docker.com  boscp08 P...!2...
 #enter_cont
 fi
@@ -1405,7 +1420,7 @@ echo "</code>"                                                               >> 
 
 #######################
 ## M A I N
-# program starts here actually  
+# program starts here actually  ici
 #######################
 
 
@@ -1607,34 +1622,26 @@ if [ $CMD_DOCKER_COMPOSE = true ]
 fi 
 
 #######################
-## BUILD  docker native 
+## BUILD, TAG and  SHIP docker native way (third pary tool docker-compose is depreciated)
 #######################
 
-if [ $CMD_DOCKER_BUILD_MOCK_NLX = true ]
-  then  docker_build_mock_nlx
+if [ ${CMD_DOCKER_BUILD_MOCK_NLX} = true ]
+  then  docker_build_image "mock-nlx" ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}
 fi
 
-if [ $CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE = true ]
-   then  docker_build_waardepapieren_service
+if [ ${CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE} = true ]
+   then  docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}
 fi
 
-if [ $CMD_DOCKER_BUILD_CLERK_FRONTEND = true ]
-   then  docker_build_clerk_frontend
+if [ ${CMD_DOCKER_BUILD_CLERK_FRONTEND} = true ]
+   then  docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}
 fi
-
-if [ ${DOCKER_TAG} = true ]
-  then docker_tag
-fi 
 
 #######################
-## SHIP 
+##  
 #######################
 
-if [ ${DOCKER_PUSH} = true ]
-  then 
-  #docker login  #Authenticating with existing credentials...
-  docker_push  #check hub.docker.com
- fi 
+
 
 
 #######################
