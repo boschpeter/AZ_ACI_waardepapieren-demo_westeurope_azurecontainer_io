@@ -30,8 +30,10 @@
 
 #'********** instructions **********
 #1. enter your parameters ...
-#2  modify functions docker config build files (be carefull)
-#3 run script . az_clone_build_ship_deploy.bash
+#2  modify functions docker config build files (be carefull or ask pim)
+#3 run script as follows 
+#  chmod +x az_clone_build_ship_deploy.bash  
+#  ./az_clone_build_ship_deploy.bash
 
 
 # Running
@@ -69,7 +71,9 @@
 #  Set the environment variable CERT_HOST_IP is with an IP (or domain) that the validator app can use to reach the clerk-frontend container.  
 #  Ensure that the validator expo app runs on the same (wifi) network as the clerk frontend. (BSN=663678651)
 
-
+## ----------------------------------
+# Step #1: Define variables
+# ----------------------------------
 ##################################################################
 # Purpose: set FQDN  start of your FQDN in azure.
 # Arguments: waardepapieren-demo
@@ -215,6 +219,10 @@ DOUBLE_CHECK=true  #cat content modified files to ${LOG_DIR}
 # modify at your own peril! because of configuration drift 
 # main purpose of this script to show configuration for containers spinning in the cloud. 
 
+
+# ----------------------------------
+# Step #2: User defined function
+# ----------------------------------
 ##################################################################
 # Purpose: modify docker-compose-travis.yml 
 # Arguments: 
@@ -821,9 +829,12 @@ TT_INSPECT_FILE=""
 
 }
 
+# -----------------------------------
+# Step #3 Main logic - infinite loop
+# ------------------------------------
 #'# Structured programming:
-#'# Entire program logic modularized in functions.
-#' ------------------------------  
+#'# Entire program logic modularized in User defined function
+
 
 ### barf  
 enter_cont() {
@@ -901,7 +912,6 @@ if ! [ -d "${LOG_DIR}" ]; then
   mkdir  ${LOG_DIR}
   
 fi 
-
 }
 
 ##################################################################
@@ -939,12 +949,11 @@ enter_touch () {
 
 cd ${TT_DIRECTORY}
 touch ${TT_INSPECT_FILE}
-
 }
 
 #
 ##################################################################
-# Purpose: DOWNLOAD
+# DOWNLOAD-FUNCTIONS
 ##################################################################
 
 
@@ -991,7 +1000,7 @@ curl -sL https://packages.microsoft.com/keys/microsoft.asc |
 
 #
 ##################################################################
-# Purpose: CLONE   
+# Purpose: CLONE-FUNCTIONS   
 ##################################################################
 
 ##################################################################
@@ -1042,7 +1051,7 @@ git config --global user.password "Peter\....ß"
 
 #
 ##################################################################
-# Purpose: BUILD
+# Purpose: BUILD-FUNCTIONS
 ##################################################################
 #
 
@@ -1058,9 +1067,8 @@ make_folder ${PROJECT_DIR}
 
 }
 
-
 ##################################################################
-# Purpose:  modify docker config
+# Purpose:   show content of Dockerfile/ configfiles. 
 # Arguments: 
 # Return: 
 ##################################################################
@@ -1110,6 +1118,17 @@ echo "========="
 enter_cont
 
 fi
+
+}
+
+##################################################################
+# Purpose:  docker system prune -a
+# Arguments: 
+# Return:   remove all docker objects  starting from scratch.
+##################################################################
+docker_system_prune() {
+  echo "-- Running ... .. docker system prune -a "
+docker system prune -a
 
 }
 
@@ -1175,6 +1194,7 @@ docker_build_image() {
   arg2=$3 #${MOCK_NLX_IMAGE}
   arg3=$4 #${DOCKER_VERSION_TAG}
   echo "- Running docker_build_image dir=$1 => $2/$2:$3  "
+  enter_cont
 
 cd ${GITHUB_DIR}/$1
 docker build -t $2/$3 .  #mind the dot!
@@ -1191,7 +1211,6 @@ cd ${GITHUB_DIR}
 
 
 }
-
 
 ##################################################################
 # Purpose:  Procedure to build waardepapieren-service image
@@ -1276,56 +1295,11 @@ create_logfile_footer
 docker images | grep  ${DOCKER_VERSION_TAG}   
 enter_cont
 
-
-}
-
-##################################################################
-# Purpose: Procedure to ship docker container images to docker hub
-# Arguments: 
-# Return: 
-##################################################################
-docker_push() {
-
-echo "Docker login"
-docker login
-create_logfile_header
-echo "- Running ... docker_push "
-echo "docker push ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG} "        >> $LOG_FILE
-echo "docker push ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG} " 
-echo "https://hub.docker.com/repository/docker/boscp08/wwaardepapieren-clerk-frontend"    >> $LOG_FILE
-docker push ${DOCKER_USER}/waardepapieren-clerk-frontend:${DOCKER_VERSION_TAG}                >> $LOG_FILE
-create_logfile_footer
-
-create_logfile_header
-echo "docker push ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG} "              >> $LOG_FILE   
-echo "docker push ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG} "     
-echo "https://hub.docker.com/repository/docker/boscp08/waardepapieren-service"           >> $LOG_FILE
-docker push ${DOCKER_USER}/waardepapieren-service:${DOCKER_VERSION_TAG}                      >> $LOG_FILE   
-create_logfile_footer
-
-create_logfile_header
-echo "docker push ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}"         >> $LOG_FILE
-echo "docker push ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}"      
-echo "https://hub.docker.com/repository/docker/boscp08/wwaardepapieren-mock-nlx"    >> $LOG_FILE
-docker push ${DOCKER_USER}/waardepapieren-mock-nlx:${DOCKER_VERSION_TAG}                >> $LOG_FILE
-create_logfile_footer
-
-if [ ${PROMPT} = true ] 
- then 
-echo "shipping to docker hub is done LOG_FILE= $LOG_FILE  "
-echo "or goto  https://hub.docker.com  docker-user=${DOCKER_USER} with version=${DOCKER_VERSION_TAG}  "
-echo "https://hub.docker.com/repository/docker/${DOCKER_USER}//wwaardepapieren-clerk-frontend"   
-echo "https://hub.docker.com/repository/docker/${DOCKER_USER}//waardepapieren-service"  
-echo "https://hub.docker.com/repository/docker/${DOCKER_USER}//wwaardepapieren-mock-nlx"    
-# blader naar https://hub.docker.com  boscp08 P...!2...
-#enter_cont
-fi
-
 }
 
 #
 ##################################################################
-# Purpose: DEPLOY on AZURE 
+# Purpose: DEPLOY-FUNCTIONS 2AZURE FROM DOCKER-HUB   
 ##################################################################
 #
 
@@ -1378,11 +1352,10 @@ az container create --resource-group ${AZ_RESOURCE_GROUP} --file deploy-aci.yaml
 # az container show --resource-group ${AZ_RESOURCE_GROUP} --name myContainerGroup --output table
 }
 
-
 ##################################################################
 # Purpose: Procedure to create the azure containergroup
 # Arguments: 
-# Return: 
+# Return: CI CD 
 ##################################################################
 restart_azure_container_group() {
 echo "- Running ... create_azure_container_group" 
@@ -1394,7 +1367,7 @@ az container restart --resource-group ${AZ_RESOURCE_GROUP}
 ##################################################################
 # Purpose: Procedure to save the program to the LOG_FILE
 # Arguments: 
-# Return: dokuwiki
+# Return: dokuwiki 
 ##################################################################
 write_az_clone_build_ship_deploy_bash() {
 echo "| ${LOG_START_DATE_TIME} | ${GITHUB_DIR}|"                               >> $LOG_FILE
@@ -1423,7 +1396,6 @@ echo "</code>"                                                               >> 
 ## M A I N
 # program starts here actually  ici
 #######################
-
 
 
 echo "***"   
@@ -1565,7 +1537,7 @@ create_directories
 
 #
 #######################
-## SET 
+## SET Dockerfile (recepies  and configuration files )
 #######################
 #
 
@@ -1616,7 +1588,6 @@ fi
 #######################
 ## BUILD  with docker-compose  depreciated
 #######################
-
 
 if [ $CMD_DOCKER_COMPOSE = true ]
   then docker_compose_min_f_docker-travis_compose_yml_up # 
