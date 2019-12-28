@@ -24,15 +24,16 @@ show_menus() {
 	echo "~~~~~~~~~~~~~~~~~~~~~"	
 	echo " M A I N - M E N U"
 	echo "~~~~~~~~~~~~~~~~~~~~~"
-	echo "1. mock_nlx_Dockerfile"
-	echo "2. docker_build_mock_nlx"
-    echo "3. Reset (docker system prune -a)"
-	echo "4. reload az_aci_clone_build_ship_deploy.bash"
-	echo "5  open -a Firefox 'https://hub.docker.com/?ref=login' boscp08 Peter!...."
-	echo "6  open -a Firefox 'https://portal.azure.com/#home' bosch.peter@outlook.com 0l..ten"
-    echo "7  open -a Firefox https://$CERT_HOST_IP:443  " #hope the clerk frontend will be stable "
-	echo "8  open -a Firefox https://github.com/BoschPeter/$GIT_REPO "
-	echo "9. Exit"
+	echo "1. docker_build_image mock_nlx"
+    echo "2. docker_build_image waardepapieren-service"
+    echo "3. docker_build_image clerk-frontend"
+    echo "4. Reset (docker system prune -a)"
+	echo "5. reload az_aci_clone_build_ship_deploy.bash"
+	echo "6. open -a Firefox 'https://hub.docker.com/?ref=login' boscp08 Peter!...."
+	echo "7. open -a Firefox 'https://portal.azure.com/#home' bosch.peter@outlook.com 0l..ten"
+    echo "8. open -a Firefox https://$CERT_HOST_IP:443  " #hope the clerk frontend will be stable "
+	echo "9. open -a Firefox https://github.com/BoschPeter/$GIT_REPO "
+	echo "10. Exit"
 }
 # read input from the keyboard and take a action
 # invoke the one() when the user select 1 from the menu option.
@@ -40,17 +41,18 @@ show_menus() {
 # Exit when user the user select 3 form the menu option.
 read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 4] " choice
+	read -p "Enter choice [ 1 - 10] " choice
 	case $choice in
-		1) mock_nlx_dockerfile ;;
-        2) docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  ;;
-		3) docker_system_prune ;;
-		4) . az_aci_clone_build_ship_deploy.bash ;;
-		5) open -a Firefox 'https://hub.docker.com/?ref=login' ;;
-        6) open -a Firefox 'https://portal.azure.com/#home' ;;
-		7) open -a Firefox https://$CERT_HOST_IP:443 ;;
-		8) open -a Firefox https://github.com/BoschPeter/$GIT_REPO ;;
-		9) exit 0;;
+		1) docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  ;;
+        2) docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  ;;
+        3) docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  ;;
+        4) docker_system_prune ;;
+		5) . az_aci_clone_build_ship_deploy.bash ;;
+		6) open -a Firefox 'https://hub.docker.com/?ref=login' ;;
+        7) open -a Firefox 'https://portal.azure.com/#home' ;;
+		8) open -a Firefox https://$CERT_HOST_IP:443 ;;
+		9) open -a Firefox https://github.com/BoschPeter/$GIT_REPO ;;
+		10) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
 }
