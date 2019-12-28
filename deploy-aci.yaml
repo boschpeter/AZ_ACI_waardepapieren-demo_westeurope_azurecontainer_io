@@ -11,7 +11,7 @@ properties:
           memoryInGb: 0.5
       ports:
       - port: 80
-  - name: waardepapieren_service:
+  - name: waardepapieren_service
     properties:
       image: boscp08/waardepapieren_service:1.0
       resources:
