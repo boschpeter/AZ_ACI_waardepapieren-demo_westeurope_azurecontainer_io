@@ -8,7 +8,10 @@ PASSWD=/etc/passwd
 RED='\033[0;41;30m'
 STD='\033[0;0;39m'
 
+echo "A menu is nothing but a list of commands presented to a user by a shell script"
+sleep 1
  . az_aci_clone_build_ship_deploy.bash
+ PROMPT=true 
 # ----------------------------------
 # Step #2: User defined function
 # ----------------------------------
@@ -24,7 +27,8 @@ show_menus() {
 	echo "1. mock_nlx_Dockerfile"
 	echo "2. docker_build_mock_nlx"
     echo "3. Reset (docker system prune -a)"
-	echo "4. Exit"
+	echo "4. reload az_aci_clone_build_ship_deploy.bash"
+	echo "5. Exit"
 }
 # read input from the keyboard and take a action
 # invoke the one() when the user select 1 from the menu option.
@@ -35,9 +39,10 @@ read_options(){
 	read -p "Enter choice [ 1 - 4] " choice
 	case $choice in
 		1) mock_nlx_dockerfile ;;
-        2) docker_build_image mock-nlx boscp08 waardepapieren_mock_nlx 1.0  ;;
+        2) docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  ;;
 		3) docker_system_prune ;;
-		4) exit 0;;
+		4) . az_aci_clone_build_ship_deploy.bash ;;
+		5) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
 }

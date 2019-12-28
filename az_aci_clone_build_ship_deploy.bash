@@ -104,8 +104,8 @@ CERT_HOST_IP=$AZ_DNSNAMELABEL.westeurope."$AZ_TLD"  #FQDN linux
 CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=$AZ_DNSNAMELABEL.westeurope.$AZ_TLD
 
 #tt overrule
-CERT_HOST_IP=localhost  #FQDN linux
-CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=localhost
+#CERT_HOST_IP=localhost  #FQDN linux
+#CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=localhost
 
 
 #echo "#######################"
@@ -154,9 +154,9 @@ DOCKER_VERSION_TAG="1.0"
 #echo "## DOCKER SHIP 
 #echo "#######################" 
 
-DOCKER_TAG=false   
+DOCKER_TAG=true  
 DOCKER_USER="boscp08"  #NB repository name must be lowercase
-DOCKER_PUSH=false #hub.docker.com   NB with docker commit you loose ENV
+DOCKER_PUSH=true #hub.docker.com   NB with docker commit you loose ENV
 
 #echo "#######################"
 #echo "## AZURE DEPLOY
@@ -1127,9 +1127,9 @@ fi
 # Return:   remove all docker objects  starting from scratch.
 ##################################################################
 docker_system_prune() {
-  echo "-- Running ... .. docker system prune -a "
-docker system prune -a
+  echo "-- Running ...docker system prune -a "
 
+docker system prune -a   
 }
 
 ##################################################################
@@ -1162,7 +1162,7 @@ docker rm $(docker ps -a -q) && docker rmi $(docker images -q)
 ##################################################################
 docker_containers_prune() {
   echo "-- Running ... .. docker_containers_prune("
-  docker container prune
+  docker container prune -a   >> $LOG_FILE
 }
 
 
@@ -1184,6 +1184,7 @@ docker-compose -f docker-compose-travis.yml up $CMD_DOCKER_COMPOSE_BUILD
 #################################################################
 # Purpose:  Procedure to build the mock-nlx image
 # Arguments: docker_build_image mock-nlx boscp08 waardepapieren_mock_nlx 1.0 
+# Arguments: docker_build_image mock-nlx ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG} 
 # Return: image
 ##################################################################
 
@@ -1193,17 +1194,23 @@ docker_build_image() {
   arg1=$2 #${DOCKER_USER}
   arg2=$3 #${MOCK_NLX_IMAGE}
   arg3=$4 #${DOCKER_VERSION_TAG}
-  echo "- Running docker_build_image dir=$1 => $2/$2:$3  "
+  echo "- Running docker_build_image dir=$1 => $2/$3:$4  "
   enter_cont
 
 cd ${GITHUB_DIR}/$1
 docker build -t $2/$3 .  #mind the dot!
 
 if [ ${DOCKER_TAG} = true ]
+clear
+echo "- Running  docker tag $2/$3:latest $2/$3:$4  "
+  enter_cont
 then docker tag $2/$3:latest $2/$3:$4
 fi
 
-if [ ${DOCKER_PUSH} = true ]
+if [ ${DOCKER_PUSH} = true 
+clear
+echo "- Running docker push $2/$3:$4  "
+enter_cont
 then docker push $2/$3:$4
 fi
 
@@ -1508,7 +1515,9 @@ if [ ${PROMPT} = true ]
 
 echo "" 
 echo "" 
+ 
 clear
+
 fi
 
 
