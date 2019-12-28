@@ -1,7 +1,7 @@
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | docker-compose-travis.yml|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io |
+| 20191228_17_34 | docker-compose-travis.yml|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io |
 <code>
 version: '3'
 services:
@@ -39,12 +39,12 @@ services:
     ports:
       - 80:80
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | Dockerfile|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/clerk-frontend |
+| 20191228_17_34 | Dockerfile|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/clerk-frontend |
 <code>
 FROM node:10
 RUN mkdir /app
@@ -73,12 +73,12 @@ RUN apt-get install -y net-tools
 ADD nginx/certs/org.crt /etc/nginx/certs/org.crt
 ADD nginx/certs/org.key /etc/nginx/certs/org.key
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | Dockerfile|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service |
+| 20191228_17_34 | Dockerfile|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service |
 <code>
 FROM node:10
 RUN mkdir /app
@@ -109,12 +109,12 @@ RUN apt-get install -y net-tools
 RUN npm install --production
 CMD npm start
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | Dockerfile|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/mock-nlx |
+| 20191228_17_34 | Dockerfile|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/mock-nlx |
 <code>
 FROM node:10
 RUN mkdir /app
@@ -123,12 +123,12 @@ WORKDIR /app
 ENV TZ=Europe/Amsterdam
 RUN npm install --production
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | waardepapieren-config-compose-travis.json|
-| 20191228_16_54 | =/Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
+| 20191228_17_34 | waardepapieren-config-compose-travis.json|
+| 20191228_17_34 | =/Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
 <code>
  {
    "EPHEMERAL_ENDPOINT" : "https://waardepapieren-demo.westeurope.azurecontainer.io:3232",
@@ -153,12 +153,12 @@ RUN npm install --production
   ]
 } 
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | waardepapieren-config-compose.json|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
+| 20191228_17_34 | waardepapieren-config-compose.json|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
 <code>
  {
    "EPHEMERAL_ENDPOINT" : "https://waardepapieren-demo.westeurope.azurecontainer.io:3232",
@@ -183,12 +183,12 @@ RUN npm install --production
   ]
 } 
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | waardepapieren-config.json|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
+| 20191228_17_34 | waardepapieren-config.json|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
 <code>
  {
    "EPHEMERAL_ENDPOINT" : "https://waardepapieren-demo.westeurope.azurecontainer.io:3232",
@@ -213,12 +213,12 @@ RUN npm install --production
   ]
 } 
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | nginx.conf|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/clerk-frontend |
+| 20191228_17_34 | nginx.conf|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/clerk-frontend |
 <code>
 events {
     worker_connections  1024;
@@ -269,12 +269,12 @@ http {
     }
 }
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - BEGIN JOB:
+20191228_17_34 - BEGIN JOB:
 -----------------------------------------------------------------------------
-| 20191228_16_54 | deploy-aci.yaml|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity |
+| 20191228_17_34 | deploy-aci.yaml|
+| 20191228_17_34 | /Users/boscp08/Projects/scratch/virtual-insanity |
 <code>
 location: westeurope
 name: Waardepapieren_demo_ACI_1
@@ -325,35 +325,7 @@ properties:
 tags: null
 type: Microsoft.ContainerInstance/containerGroups
 </code>
-20191228_16_54 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------
-20191228_16_54 - END JOB :
------------------------------------------------------------------------------
-20191228_16_56 - BEGIN JOB:
------------------------------------------------------------------------------
-| 20191228_16_54 | Dockerfile|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/mock-nlx |
-<code>
-FROM node:10
-RUN mkdir /app
-ADD index.js package.json package-lock.json /app/
-WORKDIR /app
-ENV TZ=Europe/Amsterdam
-RUN npm install --production
-</code>
-20191228_16_56 - END JOB :
------------------------------------------------------------------------------
-20191228_16_56 - BEGIN JOB:
------------------------------------------------------------------------------
-| 20191228_16_54 | Dockerfile|
-| 20191228_16_54 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/mock-nlx |
-<code>
-FROM node:10
-RUN mkdir /app
-ADD index.js package.json package-lock.json /app/
-WORKDIR /app
-ENV TZ=Europe/Amsterdam
-RUN npm install --production
-</code>
-20191228_16_56 - END JOB :
+20191228_17_34 - END JOB :
 -----------------------------------------------------------------------------

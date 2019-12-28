@@ -149,7 +149,7 @@ SERVICE_IMAGE=waardepapieren_service
 CLERK_FRONTEND_IMAGE=waardepapieren_clerk_frontend
 
 DOCKER_VERSION_TAG="1.0"
-
+#DOCKER_VERSION_TAG="2.0"
 #echo "#######################"
 #echo "## DOCKER SHIP 
 #echo "#######################" 
