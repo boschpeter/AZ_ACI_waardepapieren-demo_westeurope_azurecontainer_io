@@ -484,7 +484,7 @@ clerk_frontend_nginx_conf() {
 
 echo "- Running ... clerk_frontend_nginx_conf"
 
-TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
+TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend/nginx
 TT_INSPECT_FILE=nginx.conf
 enter_touch
 
