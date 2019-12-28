@@ -46,6 +46,8 @@ show_menus() {
 # invoke the one() when the user select 1 from the menu option.
 # invoke the two() when the user select 2 from the menu option.
 # Exit when user the user select 3 form the menu option.
+#https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/Discipl_Wigo4it_ACI/providers/Microsoft.ContainerInstance/containerGroups/Discipl_Wigo4it_ACI/containers
+
 read_options(){
 	local choice
 	read -p "Enter choice [ 1 - 17] " choice
