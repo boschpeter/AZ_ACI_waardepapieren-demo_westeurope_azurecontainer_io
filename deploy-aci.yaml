@@ -1,5 +1,5 @@
 location: westeurope
-name: Discipl_Wigo4it_DockerGroup
+name: Discipl_Wigo4it_ACI
 properties:
   containers:
   - name: waardepapieren-mock-nlx
