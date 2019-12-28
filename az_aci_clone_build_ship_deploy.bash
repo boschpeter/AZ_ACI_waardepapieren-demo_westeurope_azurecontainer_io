@@ -12,18 +12,16 @@
 # //////////////////////////////////////////////////////////////////////////////////////////
 #   File:            :az_aci_clone_build_ship_deploy.bash
 #   version          :20191204 v0
-#   File Type        :Bash 
+#   File Type        :Bash is a command processor that typically runs in a text window 
+#                     Bash can also read and execute commands from a file, called a shell script.
 #   Purpose          :download - Clone - Build - Ship - Deploy https://github.com/dsicipl/waardepapieren.git     
 #   Title:           : 
 #   Category         :CI CD
 #   Identificatie    :https://github.com/BoschPeter/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
-#   big thanks to pim Otte ,stef van Leeuwen Wigo4it vincent van der laar.  
-# //////////////////////////////////////////////////////////////////////////////////////////
 
 #example Pim Otte
 #10dec 2:35 PM @Bas Als het goed is werkt https://waardepapieren-demo.discipl.org/
 #Ik had wel hier problemen met de ICTU firewall die het blokkeerde, ik moest met mijn telefoon op 4g om het werkend te krijgen
-
 
 #https://waardepapieren-demo.discipl.org/    BSN=663678651
 #https://waardepapieren-demo.westeurope.cloudapp.azure.com  VM
@@ -38,7 +36,7 @@
 
 # Running
 #
-# The easiest way to run is using docker-compose:
+# The easiest way to run is using docker-compose:  but needs a (virtual) machine to run on.
 #
 # With docker compose you use a simple text file to define an application that consists of multiple Docker containers.
 # You then run your application with a single command that does everything to implement your defined environment.
@@ -50,13 +48,14 @@
 #    nlx-mock, which is an nlx-outway that provides access to a mock BRP service
 #
 
-#  Run docker-compose up#
+#  Run docker-compose up#  Run docker-compose down  a.k.a restart.  stop /start
 #
 #  Alternatively, you can use an offline mock, which replicates the NLX environment.
 #
 #  Run docker-compose -f docker-compose-travis.yml up
 #  The clerk frontend will be available at https://localhost:443 on your local pc. 
-#  Below the cookbook to deploy your containers in the azure cloud  (a.k.a ACI Azure Container Instance)
+#  Below the cookbook to deploy your containers as a so called ACI Azure Container Instance. 
+#  simular to k8s pod ?
 
 
 #'********** parameters **********
@@ -67,8 +66,8 @@
 
 # This is done as follows:
 #
-#    Set the environment variable CERT_HOST_IP is with an IP (or domain) that the validator app can use to reach the clerk-frontend container.  
-#   Ensure that the validator app runs on the same (wifi) network as the clerk frontend.
+#  Set the environment variable CERT_HOST_IP is with an IP (or domain) that the validator app can use to reach the clerk-frontend container.  
+#  Ensure that the validator expo app runs on the same (wifi) network as the clerk frontend. (BSN=663678651)
 
 
 ##################################################################
@@ -100,7 +99,6 @@ fi
 CERT_HOST_IP=$AZ_DNSNAMELABEL.westeurope."$AZ_TLD"  #FQDN linux
 CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=$AZ_DNSNAMELABEL.westeurope.$AZ_TLD
 
-
 #tt overrule
 CERT_HOST_IP=localhost  #FQDN linux
 CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=localhost
@@ -112,18 +110,17 @@ CERT_HOST_IP_WAARDEPAPIEREN_SERVICE_HOSTNAME=localhost
 
 # install git
 # install docker  
-# install docker-compose
+# (install docker-compose)  depreciated
 # install_azure_cli
 
 #echo "#######################"
 #echo "## CLONE
 #echo "#######################" 
 
-
 CMD_GIT_CLONE=false  
 
 #echo "#######################"
-#echo "##   docker system prune -a
+#echo "##   docker system prune -a   #from scratch
 #echo "#######################"
 
 CMD_CONTAINER_STOP=false
@@ -139,8 +136,7 @@ CMD_DOCKER_COMPOSE_BUILD=" --build"
 #echo "#######################"
 #echo "## DOCKER BUILD 
 #echo "#######################"
-
-CMD_DOCKER_BUILD_MOCK_NLX=false    #docker_build_mock_nlx
+CMD_DOCKER_BUILD_MOCK_NLX=false     #docker_build_mock_nlx
 CMD_DOCKER_BUILD_WAARDEPAPIEREN_SERVICE=false #docker_build_waardepapieren_service
 CMD_DOCKER_BUILD_CLERK_FRONTEND=false  #docker_build_clerk_frontend
 
@@ -148,28 +144,29 @@ MOCK_NLX_IMAGE=waardepapieren_mock_nlx
 SERVICE_IMAGE=waardepapieren_service
 CLERK_FRONTEND_IMAGE=waardepapieren_clerk_frontend
 
+DOCKER_VERSION_TAG="1.0"
 
 #echo "#######################"
 #echo "## DOCKER SHIP 
 #echo "#######################" 
-DOCKER_BUILD=false
+
 DOCKER_TAG=false   
 DOCKER_USER="boscp08"  #NB repository name must be lowercase
-DOCKER_VERSION_TAG="1.0"
 DOCKER_PUSH=false #hub.docker.com   NB with docker commit you loose ENV
 
 #echo "#######################"
 #echo "## AZURE DEPLOY
 #echo "#######################" 
 AZ_RESOURCE_GROUP="Waardepapieren_demo_ACI_1"  #waardepapierenVM
-AZ_RESOURCE_GROUP_DELETE=false
-AZ_RESOURCE_GROUP_CREATE=false
+CMD_AZ_RESOURCE_GROUP_DELETE=false
+CMD_AZ_RESOURCE_GROUP_CREATE=false
 
 CREATE_AZ_DEPLOY_ACI_YAML=true #@PROJECT_DIR deploy_aci.yml
 CMD_AZ_CREATE_CONTAINERGROUP=false  #.. jeuh - - Running ... ..
 CMD_AZ_RESTART_CONTAINERGROUP=false
+
 #echo "#######################"
-#echo "## DOWNLOAD / directories used 
+#echo "## DOWNLOAD / directories used building images on this pc 
 #echo "#######################" 
 
 if [ `uname` = 'Linux' ]
@@ -183,13 +180,11 @@ if  [ `uname` = 'Darwin' ]
 fi
 
 LOG_START_DATE_TIME=`date +%Y%m%d_%H_%M`  
-
 PROJECT_DIR=$HOME_DIR/Projects/scratch/virtual-insanity
 #GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io  see befores
 GITHUB_DIR=$PROJECT_DIR/${GIT_REPO}   #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git 
 LOG_DIR=${GITHUB_DIR}/LOG_DIR
 LOG_FILE=${LOG_DIR}/LOG_${LOG_START_DATE_TIME}.log
-
 
 SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME=true       # mimic native Dockerfile build  #! no volumes , no links (bridged docker network)
 SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME=true  # mimic native Dockerfile build  #! no volumes , no links (bridged docker network)
@@ -206,7 +201,7 @@ SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE=true
 SET_WAARDEPAPIEREN_SERVICE_CONFIG=true
 
 #EPHEMERAL_RETENTION_TIME=86400  #24h 
-EPHEMERAL_RETENTION_TIME=2591228  #30 dage
+EPHEMERAL_RETENTION_TIME=2591205  #30 dage
 
 #echo "#######################"
 #echo "## feedbak 
@@ -1517,7 +1512,7 @@ echo "#######################"
 echo "## DEPLOY AZURE"
 echo "#######################" 
 echo "AZ_RESOURCE_GROUP="${AZ_RESOURCE_GROUP}       #"Discipl_Wigo4it_DockerGroup2"
-echo "AZ_RESOURCE_GROUP_DELETE="$AZ_RESOURCE_GROUP_DELETE         #true
+echo "${AZ_RESOURCE_GROUP_DELETE}="$${AZ_RESOURCE_GROUP_DELETE}         #true
 echo "AZ_RESOURCE_GROUP_CREATE="$AZ_RESOURCE_GROUP_CREATE        #true
 echo "CREATE_AZ_DEPLOY_ACI_YAML="$CREATE_AZ_DEPLOY_ACI_YAML        #true  #@PROJECT_DIR deploy_aci.yml
 echo "CMD_AZ_CREATE_CONTAINERGROUP="$CMD_AZ_CREATE_CONTAINERGROUP        #true  #..nt
@@ -1638,13 +1633,6 @@ if [ ${CMD_DOCKER_BUILD_CLERK_FRONTEND} = true ]
 fi
 
 #######################
-##  
-#######################
-
-
-
-
-#######################
 ## DEPLOY 
 #######################
 
@@ -1652,24 +1640,24 @@ if [ $CREATE_AZ_DEPLOY_ACI_YAML = true  ]
   then create_azure_deploy_aci_yaml
 fi 
 
-if [ $AZ_RESOURCE_GROUP_DELETE = true ]
+if [ ${CMD_AZ_RESOURCE_GROUP_DELETE} = true ]
   then 
   delete_azure_resource_group
 fi 
 
-if [ $AZ_RESOURCE_GROUP_CREATE = true  ]
+if [ ${CMD_AZ_RESOURCE_GROUP_CREATE} = true  ]
   then  
     create_azure_resource_group
 fi 
 
-if [ $CMD_AZ_CREATE_CONTAINERGROUP = true ]
+if [ ${CMD_AZ_CREATE_CONTAINERGROUP} = true ]
   then 
   create_azure_container_group   #blader naar portal.azure.com  bosch.peter@outlook.com 0l....n
 fi 
 
-if [ $CMD_AZ_RESTART_CONTAINERGROUP = true ]
+if [ ${CMD_AZ_RESTART_CONTAINERGROUP} = true ]
   then 
-  restart_azure_container_group   #pull from docker hub blader naar portal.azure.com  bosch.peter@outlook.com 0l....n
+  restart_azure_container_group   #pulls from docker hub blader naar portal.azure.com  bosch.peter@outlook.com 0l....n
 fi 
 
 create_logfile_footer
