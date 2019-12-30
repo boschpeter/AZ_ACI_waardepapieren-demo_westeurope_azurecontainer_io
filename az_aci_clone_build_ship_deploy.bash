@@ -163,7 +163,7 @@ fi
 # Arguments: 
 # Return: 
 ##################################################################
-docker_compose_travis_yml_with_volumes() {
+set_docker_compose_travis_yml_with_volumes() {
 echo "-- Running:${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=docker-compose-travis.yml 
@@ -227,9 +227,8 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-docker_compose_travis_yml_without_volumes() {
+set_docker_compose_travis_yml_without_volumes() {
 echo "Running: ${FUNCNAME[0]} $@ "
-enter_cont
 
 TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=docker-compose-travis.yml 
@@ -315,16 +314,16 @@ check_check_doublecheck
 set_mock_nlx_dockerfile() {  
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/mock-nlx
-TT_INSPECT_FILE=Dockerfile 
+TT_INSPECT_FILE=Dockerfile
 enter_touch ${FUNCNAME[0]} $@
+#enter_cont
 
 echo "FROM node:10
 RUN mkdir /app
 ADD index.js package.json package-lock.json /app/
 WORKDIR /app
 $TIMEZONE
-RUN npm install --production" 
-> ${TT_INSPECT_FILE} 
+RUN npm install --production" > ${TT_INSPECT_FILE} 
 
 check_check_doublecheck
 }
@@ -437,13 +436,13 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-waardepapieren_service_dockerfile_with_volumes() {
+set_waardepapieren_service_dockerfile_with_volumes() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service
 TT_INSPECT_FILE=Dockerfile
 enter_touch ${FUNCNAME[0]} $@
 
-echo "FROM node:10
+echo "FROM node:10enter
 RUN mkdir /app
 ADD .babelrc package.json package-lock.json /app/
 ADD src/* app/src/
@@ -461,7 +460,7 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-waardepapieren_service_dockerfile_without_volumes() {
+set_waardepapieren_service_dockerfile_without_volumes() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service
 TT_INSPECT_FILE=Dockerfile
@@ -811,10 +810,9 @@ echo ""
 echo "========="
 pathname=${TT_DIRECTORY}
 echo "enter inspect : ${TT_INSPECT_FILE} " 
-echo "git-repo   =$(basename $pathname) "
-#echo "folder =$(basename $(dirname $pathname)) "
-#echo "project  =$(basename $(dirname $(dirname $pathname))) "
-echo "Projectdir =$PROJECT_DIR"
+echo "folder        = $(basename $pathname) "
+echo "directory     = $pathname "
+echo "repo          = $GITHUB_DIR "
 echo "========="
 echo ""
 cd ${TT_DIRECTORY}
@@ -823,13 +821,16 @@ echo ""
 echo "========="
 pathname=${TT_DIRECTORY}
 echo "enter inspect : ${TT_INSPECT_FILE} " 
-echo "git-repo   =$(basename $pathname) "
-#echo "folder =$(basename $(dirname $pathname)) "
-#echo "project  =$(basename $(dirname $(dirname $pathname))) "
-echo "Projectdir =$PROJECT_DIR"
+echo "folder        = $(basename $pathname) "
+echo "directory     = $pathname "
+echo "repo          = $GITHUB_DIR "
+
 echo "========="
 
 enter_cont
+
+cd $GITHUB_DIR
+
 
 fi
 
@@ -1239,7 +1240,12 @@ the_whole_sjebang() {
 create_logfile_header
 
 write_az_clone_build_ship_deploy_bash   
-docker_system_prune -a 
+#docker_system_prune -a
+set_docker_compose_travis_yml_without_volumes
+set_clerk_frontend_dockerfile_without_volumes
+set_waardepapieren_service_dockerfile_without_volumes
+set_mock_nlx_dockerfile
+
 docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
