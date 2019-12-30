@@ -271,7 +271,6 @@ services:
       - 80:80" > ${TT_INSPECT_FILE} 
 
 check_check_doublecheck
-
 }
 
 ##################################################################
@@ -699,30 +698,6 @@ enter_cont() {
     read
 }
 
-##################################################################
-# Purpose: show version
-# Arguments: 
-# Return: 
-##################################################################
-show_version() {
-
-create_logfile_header ${FUNCNAME[0]} $@
-echo "Running:${FUNCNAME[0]} $@"
- echo "git --version"
- git --version
-
- echo "docker -v  "
- docker -v
- 
- echo "docker-compose -v "
- docker-compose -v 
- 
- echo "az -v"
- az -v
- 
- enter_cont
- 
-}
 # /////////////////////////////////////////////////////////////////////////////////
 #  Create a Header in the logfile
 # /////////////////////////////////////////////////////////////////////////////////
@@ -730,7 +705,7 @@ create_logfile_header() {
     JOB_START_DATE_TIME=`date +%Y%m%d_%H_%M`
     echo $JOB_START_DATE_TIME - BEGIN JOB:                                             >> $LOG_FILE
     echo ----------------------------------------------------------------------------- >> $LOG_FILE
-    echo $1                                                                            >> $LOG_FILE
+    echo $1 $2                                                                         >> $LOG_FILE
     echo ----------------------------------------------------------------------------- >> $LOG_FILE
     }
 
@@ -741,9 +716,70 @@ create_logfile_footer() {
     JOB_END_DATE_TIME=`date +%Y%m%d_%H_%M`
     echo $JOB_END_DATE_TIME - END JOB :                                                >> $LOG_FILE
     echo ----------------------------------------------------------------------------- >> $LOG_FILE
-    echo $1                                                                            >> $LOG_FILE
+    echo $1 $2                                                                         >> $LOG_FILE
     echo ----------------------------------------------------------------------------- >> $LOG_FILE
     }
+
+##################################################################
+# Purpose: Procedure to create directories specified
+# Arguments: 
+# Return: To check if a directory exists in a shell script you can use the following:
+##################################################################
+create_logdir() {
+if ! [ -d "${LOG_DIR}" ]; then
+  cd $PROJECT_DIR
+  sduo chmod -R 777  ${GITHUB_DIR}
+  mkdir  ${LOG_DIR}
+fi 
+}
+##################################################################
+# Purpose: #echo ${PROJECT_DIR} | awk -F/ '{print "/"$2"/"$3"/"$4"/"$5"/"$6}'
+# Arguments: directory structure  #/home/boscp08/Projects/scratch/virtual-insanity
+# Return: a folder  /home/boscp08/Dropbox/tt/Waardepapieren-AZURE-ACI
+##################################################################
+ make_folder() 
+    {
+     #echo $1
+    
+   if ! [ -d $1 ]; then
+    echo $1 > struct.txt
+    sed '/^$/d;s/ /\//g' struct.txt | xargs mkdir -p 
+    rm struct.txt
+     
+     if [ ${PROMPT} = true ]   
+        then 
+        echo "$1 Directorie(s) have been made"
+        cd $1
+        pwd
+    fi   
+    
+    #else   echo "$1 directory already exists "
+   fi
+   }
+
+##################################################################
+# Purpose: Procedure to create an empty file
+# Arguments: 
+# Return: 
+##################################################################
+enter_touch() {
+cd ${TT_DIRECTORY}
+touch ${TT_INSPECT_FILE}
+}
+
+##################################################################
+# Purpose:   procedure 
+# Arguments: 
+# Return: 
+##################################################################
+check_check_doubelcheck() {
+if [ ${DOUBLE_CHECK} =  true ]
+  then enter_inspect
+fi 
+TT_DIRECTORY=""
+TT_INSPECT_FILE=""
+}
+
 
 ##################################################################
 # Purpose:   show content of Dockerfile/ configfiles. 
@@ -799,19 +835,6 @@ fi
 }
 
 ##################################################################
-# Purpose:   procedure 
-# Arguments: 
-# Return: 
-##################################################################
-check_check_doubelcheck() {
-if [ ${DOUBLE_CHECK} =  true ]
-  then enter_inspect
-fi 
-TT_DIRECTORY=""
-TT_INSPECT_FILE=""
-}
-
-##################################################################
 # Purpose: create directories if neccecary.
 # Arguments: 
 # Return: specified directory structure
@@ -820,94 +843,34 @@ create_directories() {
 make_folder ${PROJECT_DIR}     
 }
 
-#################################################
-# Purpose: Procedure concurrent version system
-# Arguments: 
-# Return: 
-##################################################################
-
-git_init() {
-echo "Running:${FUNCNAME[0]} $@"
-cd $GITHUB_DIR
-git init
-#Initialized empty Git repository in /home/boscp08/Dropbox/Github/.git/
-git config --global credential.helper store
-git config --global user.email "bosch.peter@icloud.com"
-git config --global user.name "BoschPeter"
-git config --global user.password "Peter\!..."  #mind macos keyring
-}
-
-##################################################################
-# Purpose: Procedure to clone de github repo on your pc
-# Arguments: 
-# Return: 
-##################################################################
-
-git_clone() {
- echo "Running:${FUNCNAME[0]} $@"
- create_logfile_header ${FUNCNAME[0]} $@
- echo "rm -rf ${PROJECT_DIR}/$1 sure?"
- enter_cont
- cd ${PROJECT_DIR}
- rm -rf ${GIT_REPO}
- #git clone https://github.com/discipl/waardepapieren.git
- #git clone https://github.com/AZ_VM_waardepapieren-demo_westeurope_cloudapp_azure_com.git
- #git clone https://github.com/BoschPeter/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io.git
- git clone https://github.com/${GIT_REPO}.git  
- 
- create_logfile_footer
-}
-##################################################################
-# Purpose: Procedure to create directories specified
-# Arguments: 
-# Return: To check if a directory exists in a shell script you can use the following:
-##################################################################
-create_logdir() {
-if ! [ -d "${LOG_DIR}" ]; then
-  cd $PROJECT_DIR
-  sduo chmod -R 777  ${GITHUB_DIR}
-  mkdir  ${LOG_DIR}
-fi 
-}
-##################################################################
-# Purpose: #echo ${PROJECT_DIR} | awk -F/ '{print "/"$2"/"$3"/"$4"/"$5"/"$6}'
-# Arguments: directory structure  #/home/boscp08/Projects/scratch/virtual-insanity
-# Return: a folder  /home/boscp08/Dropbox/tt/Waardepapieren-AZURE-ACI
-##################################################################
- make_folder() 
-    {
-     #echo $1
-    
-   if ! [ -d $1 ]; then
-    echo $1 > struct.txt
-    sed '/^$/d;s/ /\//g' struct.txt | xargs mkdir -p 
-    rm struct.txt
-     
-     if [ ${PROMPT} = true ]   
-        then 
-        echo "$1 Directorie(s) have been made"
-        cd $1
-        pwd
-    fi   
-    
-    #else   echo "$1 directory already exists "
-   fi
-   }
-
-##################################################################
-# Purpose: Procedure to create an empty file
-# Arguments: 
-# Return: 
-##################################################################
-enter_touch  () {
-cd ${TT_DIRECTORY}
-touch ${TT_INSPECT_FILE}
-}
-
 ##################################################################
 # Purpose: DOWNLOAD-FUNCTIONS
 ##################################################################
 
+##################################################################
+# Purpose: show version
+# Arguments: 
+# Return: 
+##################################################################
+show_version() {
+create_logfile_header ${FUNCNAME[0]} $@
+echo "Running:${FUNCNAME[0]} $@"
+ echo "git --version"
+ git --version
+
+ echo "docker -v  "
+ docker -v
+ 
+ echo "docker-compose -v "
+ docker-compose -v 
+ 
+ echo "az -v"
+ az -v
+ 
+ enter_cont
+ 
+}
+ß
 ##################################################################
 # Purpose: Procedure to install Docker command line interface
 # Arguments: 
@@ -976,6 +939,45 @@ git config --global user.password "Peter\....ß"
 #cd into 
 
 }
+
+#################################################
+# Purpose: Procedure concurrent version system
+# Arguments: 
+# Return: 
+##################################################################
+
+git_init() {
+echo "Running:${FUNCNAME[0]} $@"
+cd $GITHUB_DIR
+git init
+#Initialized empty Git repository in /home/boscp08/Dropbox/Github/.git/
+git config --global credential.helper store
+git config --global user.email "bosch.peter@icloud.com"
+git config --global user.name "BoschPeter"
+git config --global user.password "Peter\!..."  #mind macos keyring
+}
+
+##################################################################
+# Purpose: Procedure to clone de github repo on your pc
+# Arguments: 
+# Return: 
+##################################################################
+
+git_clone() {
+ echo "Running:${FUNCNAME[0]} $@"
+ create_logfile_header ${FUNCNAME[0]} $@
+ echo "rm -rf ${PROJECT_DIR}/$1 sure?"
+ enter_cont
+ cd ${PROJECT_DIR}
+ rm -rf ${GIT_REPO}
+ #git clone https://github.com/discipl/waardepapieren.git
+ #git clone https://github.com/AZ_VM_waardepapieren-demo_westeurope_cloudapp_azure_com.git
+ #git clone https://github.com/BoschPeter/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io.git
+ git clone https://github.com/${GIT_REPO}.git  
+ 
+ create_logfile_footer
+}
+
 ##################################################################
 # Purpose: DOCKER_BUILD-FUNCTIONS
 ##################################################################
@@ -983,7 +985,7 @@ git config --global user.password "Peter\....ß"
 ##################################################################
 # Purpose:  docker system prune -a
 # Arguments: 
-# Return:   remove all docker objects  starting from scratch.
+# Return:   remove all docker objects  starting from scratch... 
 ##################################################################
 docker_system_prune() {
 echo "Running:${FUNCNAME[0]} $@"
@@ -1065,11 +1067,9 @@ arg2=$2 #${MOCK_NLX_IMAGE}
 arg3=$3 #${DOCKERHUB_MOCK_NLX_IMAGE}
 arg4=$4 #${DOCKER_VERSION_TAG}
 docker tag $1/$2:latest $1/$3:$4
-
 }  
 
-
-
+ß
 ##################################################################
 # Purpose:  Build an image from a Dockerfile
 # Arguments: docker build -t boscp08/waardepapieren-service .   NB [.] periode means from this directory 
@@ -1081,6 +1081,7 @@ create_logfile_header ${FUNCNAME[0]} $@
 cd ${GITHUB_DIR}/waardepapieren-service
 docker build -t ${DOCKER_USER}/waardepapieren-service .  #NB [.] periode means from this directory 
 }
+
 ##################################################################
 # Purpose:  Procedure to build the waardepapieren images and run containers.  
 # Arguments: docker build -t boscp08/     NB . periode means from this directory 
@@ -1104,6 +1105,7 @@ create_logfile_header ${FUNCNAME[0]} $@
 docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+}
 
 ##################################################################
 # Purpose:  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
@@ -1148,7 +1150,6 @@ docker commit ${CLERK_FRONTEND_IMAGE} ${DOCKER_USER}/${DOCKER_HUB_CLERK_FRONTEND
 create_logfile_footer
 }
 
-
 ##################################################################
 # DEPLOY-FUNCTIONS 2AZURE FROM DOCKER-HUB   
 ##################################################################
@@ -1161,8 +1162,8 @@ create_logfile_footer
 create_azure_resource_group() {
 echo "-- Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
-az login -u $AZURE_USER  -p AZURE_PWD
-#enter_cont
+az login -u $AZURE_USER  -p $AZURE_PWD
+#az group create --name $AZ_RESOURCE_GROUP --location westeurope
 az group create --name $1 --location westeurope
 enter_cont
 }
@@ -1173,9 +1174,10 @@ enter_cont
 # Return: 
 ##################################################################
 delete_azure_resource_group() {
-echo "-- Running:${FUNCNAME[0]} $@ $@"
+echo "-- Running:${FUNCNAME[0]} $@ "
 create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
+#az group delete --name $AZ_RESOURCE_GROUP
 az group delete --name $1
 enter_cont
 }
@@ -1189,6 +1191,7 @@ create_azure_container_group() {
 echo "-- Running:${FUNCNAME[0]} $@"
 az login -u $AZURE_USER  -p $AZURE_PWD
 cd ${GITHUB_DIR}
+#az container create --resource-group $AZ_RESOURCE_GROUP --file deploy-aci.yaml
 az container create --resource-group $1 --file deploy-aci.yaml
 
 enter_cont
@@ -1204,6 +1207,7 @@ enter_cont
 ##################################################################
 az_container_show() {
 echo "-- Running:${FUNCNAME[0]} $@"  
+#az container show --resource-group ${AZ_RESOURCE_GROUP} --name $2 --output table
 az container show --resource-group $1--name $2 --output table
 }
 
@@ -1215,6 +1219,7 @@ az container show --resource-group $1--name $2 --output table
 restart_azure_container_group() {
 echo "Running: create_azure_container_group" 
 cd ${PROJECT_DIR}
+#az container restart --resource-group ${AZ_RESOURCE_GROUP}
 az container restart --resource-group $1
 }
 
