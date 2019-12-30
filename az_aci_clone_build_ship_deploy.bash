@@ -220,7 +220,7 @@ services:
     #test:
     #driver: bridge" >  ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -271,7 +271,7 @@ services:
     ports:
       - 80:80" > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -303,7 +303,7 @@ FROM nginx:1.15.8
 ADD nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --from=0 /app/build /usr/share/nginx/html"  > ${TT_INSPECT_FILE} #Dockerfile
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -325,7 +325,7 @@ WORKDIR /app
 $TIMEZONE
 RUN npm install --production" > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -365,7 +365,7 @@ RUN apt-get install -y net-tools
 ADD nginx/certs/org.crt /etc/nginx/certs/org.crt
 ADD nginx/certs/org.key /etc/nginx/certs/org.key"  > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -427,7 +427,7 @@ http {
     }
 }" > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck 
+check_check_doublecheck  ${FUNCNAME[0]} $@ 
 
 } 
 
@@ -453,7 +453,7 @@ WORKDIR /app
 RUN npm install --production
 CMD npm start"   > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -495,7 +495,7 @@ RUN apt-get install -y net-tools
 
 RUN npm install --production
 CMD npm start"  > ${TT_INSPECT_FILE} 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 #----------------------------------------------
@@ -536,7 +536,7 @@ echo " {
   ]
 } " > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -573,7 +573,7 @@ echo " {
   ]
 } " > ${TT_INSPECT_FILE} # waardepapieren-config-compose-travis.json
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -610,7 +610,7 @@ echo " {
   ]
 } " > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 
@@ -681,7 +681,7 @@ properties:
 tags: null
 type: Microsoft.ContainerInstance/containerGroups" > ${TT_INSPECT_FILE} 
 
-check_check_doublecheck
+check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 # -----------------------------------
 # Main logic  below
