@@ -4,7 +4,6 @@
 #  
 #   Description :- This script builds "waardepapieren" containers and ships images to hub.docker.com and beyond to ACI
 #   Modified           Date           Description
-#   --------           --------       -------------------------------------------------
 #   Peter Bosch       20.12.2019      processing technical dept
 #   Peter Bosch       05.12.2019      Initial version.
 #
@@ -26,7 +25,7 @@
 #  https://waardepapieren-demo.westeurope.azurecontainer.io ACI
 #  https://waardepapieren-demo.westeurope.azurecontainer.io ACI
 
-#  ********** instructions **********
+# ===== INSTRUCTIONS ======
 # 1. enter your variable ...
 # 2. run a menu driven shell. 
 # 3. run this script as follows 
@@ -614,10 +613,6 @@ check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 
-*----------------------------------------------
-*----------------------------------------------
-
-
 ##################################################################
 # Purpose: hack into azure deploy ACI
 # Arguments: 
@@ -708,10 +703,10 @@ enter_cont() {
 # /////////////////////////////////////////////////////////////////////////////////
 create_logfile_header() {
     JOB_START_DATE_TIME=`date +%Y%m%d_%H_%M`
-    echo $JOB_START_DATE_TIME - BEGIN JOB:                                             >> $LOG_FILE
-    echo ----------------------------------------------------------------------------- >> $LOG_FILE
-    echo $1 $2                                                                         >> $LOG_FILE
-    echo ----------------------------------------------------------------------------- >> $LOG_FILE
+    echo $JOB_START_DATE_TIME - BEGIN JOB:                                             >> ${LOG_FILE}
+    echo ----------------------------------------------------------------------------- >> ${LOG_FILE}
+    echo $1 $2                                                                         >> ${LOG_FILE}
+    echo ----------------------------------------------------------------------------- >> ${LOG_FILE}
     }
 
 # /////////////////////////////////////////////////////////////////////////////////
@@ -719,10 +714,10 @@ create_logfile_header() {
 # /////////////////////////////////////////////////////////////////////////////////
 create_logfile_footer() {
     JOB_END_DATE_TIME=`date +%Y%m%d_%H_%M`
-    echo $JOB_END_DATE_TIME - END JOB :                                                >> $LOG_FILE
-    echo ----------------------------------------------------------------------------- >> $LOG_FILE
-    echo $1 $2                                                                         >> $LOG_FILE
-    echo ----------------------------------------------------------------------------- >> $LOG_FILE
+    echo $JOB_END_DATE_TIME - END JOB :                                                >> ${LOG_FILE}
+    echo ----------------------------------------------------------------------------- >> ${LOG_FILE}
+    echo $1 $2                                                                         >> ${LOG_FILE}
+    echo ----------------------------------------------------------------------------- >> ${LOG_FILE}
     }
 
 ##################################################################
@@ -796,18 +791,18 @@ TT_INSPECT_FILE=""
 enter_inspect() {
 clear
 
-if [ -f "${TT_INSPECT_FILE}" ]; then
+if [ -f "${TT_INSPECT_FILE}" ]; 
+then
  
-echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE  
-echo "| ${LOG_START_DATE_TIME} | ${TT_DIRECTORY} |"                                  >> $LOG_FILE
-echo "<code>"                                                                        >> $LOG_FILE
-cat  ${TT_INSPECT_FILE}                                                              >> $LOG_FILE
-echo "</code>"                                                                       >> $LOG_FILE
+echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> ${LOG_FILE} 
+echo "| ${LOG_START_DATE_TIME} | ${TT_DIRECTORY} |"                                  >> ${LOG_FILE}
+echo "<code>"                                                                        >> ${LOG_FILE}
+cat  ${TT_INSPECT_FILE}                                                              >> ${LOG_FILE}
+#echo "<\/code>"                                                                     >> ${LOG_FILE}
 create_logfile_footer
 
 else 
 cd ${GITHUB_DIR}
-
 clear
 echo "File ${TT_INSPECT_FILE} is missing or cannot be executed"   
 enter_cont
@@ -884,7 +879,7 @@ echo "Running:${FUNCNAME[0]} $@"
  enter_cont
  
 }
-ß
+
 ##################################################################
 # Purpose: Procedure to install Docker command line interface
 # Arguments: 
@@ -1089,7 +1084,7 @@ arg4=$4 #${DOCKER_VERSION_TAG}
 docker tag $1/$2:latest $1/$3:$4
 }  
 
-ß
+
 ##################################################################
 # Purpose:  Build an image from a Dockerfile
 # Arguments: docker build -t boscp08/waardepapieren-service .   NB [.] periode means from this directory 
@@ -1308,18 +1303,18 @@ fi
 ##################################################################
 write_az_clone_build_ship_deploy_bash() {
 
-echo "====== az_clone_build_ship_deploy.bash ======"                         >> $LOG_FILE
-echo "| ${LOG_START_DATE_TIME} | ${GITHUB_DIR}|"                             >> $LOG_FILE
-echo "| ${LOG_START_DATE_TIME} | az_clone_build_ship_deploy.bash |"          >> $LOG_FILE
-echo  "<code>"                                                               >> $LOG_FILE 
-cat  ${GITHUB_DIR}/az_aci_clone_build_ship_deploy.bash                       >> $LOG_FILE
-echo "</code>"                                                               >> $LOG_FILE
-echo "====== menu.bash  ======"                                              >> $LOG_FILE
-echo "| ${LOG_START_DATE_TIME} | ${GITHUB_DIR}|"                             >> $LOG_FILE
-echo "| ${LOG_START_DATE_TIME} | menu.bash |"                                >> $LOG_FILE
-echo  "<code>"                                                               >> $LOG_FILE 
-cat  ${GITHUB_DIR}/menu.bash                                                 >> $LOG_FILE
-echo "</code>"                                                               >> $LOG_FILE
+echo "====== az_clone_build_ship_deploy.bash ======"                         >> ${LOG_FILE}
+echo "| ${LOG_START_DATE_TIME} | ${GITHUB_DIR}|"                             >> ${LOG_FILE}
+echo "| ${LOG_START_DATE_TIME} | az_clone_build_ship_deploy.bash |"          >> ${LOG_FILE}
+echo  "<code>"                                                               >> ${LOG_FILE} 
+cat  ${GITHUB_DIR}/az_aci_clone_build_ship_deploy.bash                       >> ${LOG_FILE}
+echo "</code>"                                                               >> ${LOG_FILE}
+echo "====== menu.bash  ======"                                              >> ${LOG_FILE}
+echo "| ${LOG_START_DATE_TIME} | ${GITHUB_DIR}|"                             >> ${LOG_FILE}
+echo "| ${LOG_START_DATE_TIME} | menu.bash |"                                >> ${LOG_FILE}
+echo  "<code>"                                                               >> ${LOG_FILE} 
+cat  ${GITHUB_DIR}/menu.bash                                                 >> ${LOG_FILE}
+#echo "</code>"                                                               >> ${LOG_FILE}
 
 }
 #######################
@@ -1338,32 +1333,32 @@ echo "***"
 create_logdir
 create_directories
 create_logfile_header
-echo "#######################"                                                >> $LOG_FILE
-echo "## variables"                                                           >> $LOG_FILE
-echo "#######################"                                                >> $LOG_FILE
-echo "PROJECT_DIR=$PROJECT_DIR"                                               >> $LOG_FILE
-echo "GIT_USER=$GIT_USER"                                                     >> $LOG_FILE
-echo "GIT_REPO=$GIT_REPO"                                                     >> $LOG_FILE
-echo "GITHUB_DIR=$GITHUB_DIR"                                                 >> $LOG_FILE
-echo "DOCKER_USER=$DOCKER_USER"                                               >> $LOG_FILE
-echo "COMPOSE_BUILD_FLAG=$COMPOSE_BUILD_FLAG"                                 >> $LOG_FILE
-echo "MOCK_NLX_IMAGE=$MOCK_NLX_IMAGE"                                         >> $LOG_FILE
-echo "SERVICE_IMAGE=$SERVICE_IMAGE"                                           >> $LOG_FILE
-echo "CLERK_FRONTEND_IMAGE=$CLERK_FRONTEND_IMAGE"                             >> $LOG_FILE
-echo "DOCKERHUB_MOCK_NLX_IMAGE=$DOCKERHUB_MOCK_NLX_IMAGE"                     >> $LOG_FILE
-echo "DOCKERHUB_SERVICE_IMAGE=$DOCKERHUB_SERVICE_IMAGE"                       >> $LOG_FILE
-echo "DOCKERHUB_CLERK_FRONTEND_IMAGE=$DOCKERHUB_CLERK_FRONTEND_IMAGE"         >> $LOG_FILE
-echo "DOCKER_VERSION_TAG=$DOCKER_VERSION_TAG"                                 >> $LOG_FILE
-echo "AZ_RESOURCE_GROUP=$AZ_RESOURCE_GROUP"                                   >> $LOG_FILE
-echo "AZ_DNSNAMELABEL=$AZ_DNSNAMELABEL"                                       >> $LOG_FILE
-echo "TARGET_HOST=$TARGET_HOST"                                               >> $LOG_FILE
-echo "AZ_TLD=$AZ_TLD"                                                         >> $LOG_FILE
-echo "TIMEZONE=$TIMEZONE"                                                     >> $LOG_FILE
-echo "CERT_HOST_IP=$CERT_HOST_IP"                                             >> $LOG_FILE
-echo "CERT_HOST_IP_WP_SERVICE_HOSTNAME=$CERT_HOST_IP_WP_SERVICE_HOSTNAME"     >> $LOG_FILE
-echo "#######################"                                                >> $LOG_FILE
-echo "## variables"                                                           >> $LOG_FILE
-echo "#######################"                                                >> $LOG_FILE
+echo "#######################"                                                >> ${LOG_FILE}
+echo "## variables"                                                           >> ${LOG_FILE}
+echo "#######################"                                                >> ${LOG_FILE}
+echo "PROJECT_DIR=$PROJECT_DIR"                                               >> ${LOG_FILE}
+echo "GIT_USER=$GIT_USER"                                                     >> ${LOG_FILE}
+echo "GIT_REPO=$GIT_REPO"                                                     >> ${LOG_FILE}
+echo "GITHUB_DIR=$GITHUB_DIR"                                                 >> ${LOG_FILE}
+echo "DOCKER_USER=$DOCKER_USER"                                               >> ${LOG_FILE}
+echo "COMPOSE_BUILD_FLAG=$COMPOSE_BUILD_FLAG"                                 >> ${LOG_FILE}
+echo "MOCK_NLX_IMAGE=$MOCK_NLX_IMAGE"                                         >> ${LOG_FILE}
+echo "SERVICE_IMAGE=$SERVICE_IMAGE"                                           >> ${LOG_FILE}
+echo "CLERK_FRONTEND_IMAGE=$CLERK_FRONTEND_IMAGE"                             >> ${LOG_FILE}
+echo "DOCKERHUB_MOCK_NLX_IMAGE=$DOCKERHUB_MOCK_NLX_IMAGE"                     >> ${LOG_FILE}
+echo "DOCKERHUB_SERVICE_IMAGE=$DOCKERHUB_SERVICE_IMAGE"                       >> ${LOG_FILE}
+echo "DOCKERHUB_CLERK_FRONTEND_IMAGE=$DOCKERHUB_CLERK_FRONTEND_IMAGE"         >> ${LOG_FILE}
+echo "DOCKER_VERSION_TAG=$DOCKER_VERSION_TAG"                                 >> ${LOG_FILE}
+echo "AZ_RESOURCE_GROUP=$AZ_RESOURCE_GROUP"                                   >> ${LOG_FILE}
+echo "AZ_DNSNAMELABEL=$AZ_DNSNAMELABEL"                                       >> ${LOG_FILE}
+echo "TARGET_HOST=$TARGET_HOST"                                               >> ${LOG_FILE}
+echo "AZ_TLD=$AZ_TLD"                                                         >> ${LOG_FILE}
+echo "TIMEZONE=$TIMEZONE"                                                     >> ${LOG_FILE}
+echo "CERT_HOST_IP=$CERT_HOST_IP"                                             >> ${LOG_FILE}
+echo "CERT_HOST_IP_WP_SERVICE_HOSTNAME=$CERT_HOST_IP_WP_SERVICE_HOSTNAME"     >> ${LOG_FILE}
+echo "#######################"                                                >> ${LOG_FILE}
+echo "## variables"                                                           >> ${LOG_FILE}
+echo "#######################"                                                >> ${LOG_FILE}
 
 
 ##################################################################
@@ -1373,7 +1368,7 @@ echo "#######################"                                                >>
 ##################################################################
 if [ ${PROMPT} = true ] 
  then 
-clear
+#clear
 PROMPT=""
 while true; do
     read -p "Display all variables  (y or n)?" yn
@@ -1587,7 +1582,7 @@ if [ ${WRITE_CODE} = true ]
  then 
  cd ${GITHUB_DIR}
  write_az_clone_build_ship_deploy_bash
- cat $LOG_FILE | more
+ cat ${LOG_FILE} | more
 echo "" 
 echo "" 
 clear
