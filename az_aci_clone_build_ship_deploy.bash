@@ -1,6 +1,6 @@
 #! /bin/bash
 # //////////////////////////////////////////////////////////////////////////////////////////
-#   File Type   :- BASH Script (needs GIT-cli,  docker-CLI and AZURE-CLI installed)
+#   File Type   :- BASH Script (needs GIT-CLI,  docker-CLI and AZURE-CLI installed)
 #  
 #   Description :- This script builds "waardepapieren" containers and ships images to hub.docker.com and beyond to ACI
 #   Modified           Date           Description
@@ -168,10 +168,9 @@ docker_compose_travis_yml_with_volumes() {
 echo "-- Running:${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=docker-compose-travis.yml 
-enter_touch ${FUNCNAME[0]} $@"  
+enter_touch ${FUNCNAME[0]} $@
 
-echo 
-"version: '3'
+echo "version: '3'
 services:
   waardepapieren-service:
     volumes:
@@ -219,8 +218,8 @@ services:
     
     #networks:
     #test:
-    #driver: bridge"     
- > ${TT_INSPECT_FILE} 
+    #driver: bridge" >  ${TT_INSPECT_FILE} 
+
 check_check_doublecheck
 }
 
@@ -338,8 +337,7 @@ echo "Running: ${FUNCNAME[0]} $@ "
 TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
 TT_INSPECT_FILE=Dockerfile 
 enter_touch ${FUNCNAME[0]} $@
-echo 
-"FROM node:10
+echo "FROM node:10
 RUN mkdir /app
 ADD package.json package-lock.json /app/
 ENV REACT_APP_EPHEMERAL_ENDPOINT=https://${CERT_HOST_IP}:443/api/eph
@@ -443,8 +441,7 @@ TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service
 TT_INSPECT_FILE=Dockerfile
 enter_touch ${FUNCNAME[0]} $@
 
-echo 
-"FROM node:10
+echo "FROM node:10
 RUN mkdir /app
 ADD .babelrc package.json package-lock.json /app/
 ADD src/* app/src/
@@ -453,8 +450,7 @@ ENV WAARDEPAPIEREN_CONFIG /app/configuration/waardepapieren-config.json
 ENV TZ=Europe/Amsterdam
 WORKDIR /app
 RUN npm install --production
-CMD npm start"  
-> ${TT_INSPECT_FILE} 
+CMD npm start"   > ${TT_INSPECT_FILE} 
 check_check_doublecheck
 }
 
@@ -469,8 +465,7 @@ TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service
 TT_INSPECT_FILE=Dockerfile
 enter_touch ${FUNCNAME[0]} $@
 
-echo 
-"FROM node:10
+echo "FROM node:10
 RUN mkdir /app
 ADD .babelrc package.json package-lock.json /app/
 ADD src/* app/src/
@@ -773,8 +768,10 @@ touch ${TT_INSPECT_FILE}
 # Arguments: 
 # Return: 
 ##################################################################
-check_check_doubelcheck() {
+check_check_doublecheck() {
 if [ ${DOUBLE_CHECK} =  true ]
+#echo "check check double check"
+#enter_cont
   then enter_inspect
 fi 
 TT_DIRECTORY=""
@@ -789,6 +786,7 @@ TT_INSPECT_FILE=""
 ##################################################################
 enter_inspect() {
 clear
+
 
 if [ -f "${TT_INSPECT_FILE}" ]; then
  
@@ -814,19 +812,22 @@ echo ""
 echo "========="
 pathname=${TT_DIRECTORY}
 echo "enter inspect : ${TT_INSPECT_FILE} " 
-echo "folder   =$(basename $pathname) "
-echo "git-repo =$(basename $(dirname $pathname)) "
-echo "project  =$(basename $(dirname $(dirname $pathname))) "
+echo "git-repo   =$(basename $pathname) "
+#echo "folder =$(basename $(dirname $pathname)) "
+#echo "project  =$(basename $(dirname $(dirname $pathname))) "
+echo "Projectdir =$PROJECT_DIR"
 echo "========="
 echo ""
-cat  ${TT_INSPECT_FILE} | more
+cd ${TT_DIRECTORY}
+cat ${TT_INSPECT_FILE} 
 echo ""
 echo "========="
 pathname=${TT_DIRECTORY}
 echo "enter inspect : ${TT_INSPECT_FILE} " 
-echo "folder = $(basename $pathname) "
-echo "git-repo=$(basename $(dirname $pathname)) "
-echo "project=$(basename $(dirname $(dirname $pathname))) "
+echo "git-repo   =$(basename $pathname) "
+#echo "folder =$(basename $(dirname $pathname)) "
+#echo "project  =$(basename $(dirname $(dirname $pathname))) "
+echo "Projectdir =$PROJECT_DIR"
 echo "========="
 
 enter_cont
@@ -1427,7 +1428,7 @@ fi
 echo
 echo "hope the run will be ok!"
 echo
-sleep 2
+
 
 echo " cd back into " ${GITHUB_DIR}
 cd ${GITHUB_DIR}
