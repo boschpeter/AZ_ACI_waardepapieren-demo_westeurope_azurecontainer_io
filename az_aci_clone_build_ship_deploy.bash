@@ -154,6 +154,7 @@ if  ! [ "$the_world_is_flat" = true ] ; then
     echo 'Be careful not to fall off!'
 fi
 
+
 # ----------------------------------
 # Step 2 : setters
 # ----------------------------------
@@ -310,7 +311,6 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-
 set_mock_nlx_dockerfile() {  
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/mock-nlx
@@ -452,6 +452,7 @@ ENV TZ=Europe/Amsterdam
 WORKDIR /app
 RUN npm install --production
 CMD npm start"   > ${TT_INSPECT_FILE} 
+
 check_check_doublecheck
 }
 
@@ -497,15 +498,19 @@ CMD npm start"  > ${TT_INSPECT_FILE}
 check_check_doublecheck
 }
 
-##################################################################
-# Purpose: 
+#----------------------------------------------
+#--------------------------------------------
+
+
+#################################################################
+# Purpose: hack 
 # Arguments: 
-# Return:  
+# Return: 
 ##################################################################
-set_clerk_frontend_dockerfile_without_volumes() {
+set_waardepapieren_service_config_compose_travis_json() {
 echo "Running: ${FUNCNAME[0]} $@"
-TT_DIRECTORY==${GITHUB_DIR}/waardepapieren-service/configuration
-TT_INSPECT_FILE=waardepapieren-config-compose-travis.json
+TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service/configuration
+TT_INSPECT_FILE=waardepapieren-config-compose_travis.json
 enter_touch ${FUNCNAME[0]} $@
 
 echo " {
@@ -535,7 +540,7 @@ check_check_doublecheck
 }
 
 ##################################################################
-# Purpose: 
+# Purpose: hack 
 # Arguments: 
 # Return: 
 ##################################################################
@@ -608,6 +613,11 @@ echo " {
 check_check_doublecheck
 }
 
+
+*----------------------------------------------
+*----------------------------------------------
+
+
 ##################################################################
 # Purpose: hack into azure deploy ACI
 # Arguments: 
@@ -673,7 +683,6 @@ type: Microsoft.ContainerInstance/containerGroups" > ${TT_INSPECT_FILE}
 
 check_check_doublecheck
 }
-
 # -----------------------------------
 # Main logic  below
 # ------------------------------------
@@ -772,7 +781,8 @@ check_check_doublecheck() {
 if [ ${DOUBLE_CHECK} =  true ]
 #echo "check check double check"
 #enter_cont
-  then enter_inspect
+
+then enter_inspect $1
 fi 
 TT_DIRECTORY=""
 TT_INSPECT_FILE=""
@@ -796,7 +806,8 @@ echo "</code>"                                                                  
 create_logfile_footer
 
 else 
-cd ${DOCKER_COMPOSE_DIR}
+cd ${GITHUB_DIR}
+
 clear
 echo "File ${TT_INSPECT_FILE} is missing or cannot be executed"   
 enter_cont
@@ -813,6 +824,7 @@ echo "enter inspect : ${TT_INSPECT_FILE} "
 echo "folder        = $(basename $pathname) "
 echo "directory     = $pathname "
 echo "repo          = $GITHUB_DIR "
+echo "function      = $1 "
 echo "========="
 echo ""
 cd ${TT_DIRECTORY}
@@ -824,7 +836,7 @@ echo "enter inspect : ${TT_INSPECT_FILE} "
 echo "folder        = $(basename $pathname) "
 echo "directory     = $pathname "
 echo "repo          = $GITHUB_DIR "
-
+echo "function      = $1 "
 echo "========="
 
 enter_cont
@@ -1461,9 +1473,9 @@ show_menus() {
     echo "#Step 3 : Networking setters" 
     echo "# ----------------------------------" 
     echo "30. set_clerk_frontend_nginx_conf"
-    echo "31. set_waardepapieren_service_config_compose_json"
-    echo "32. set_waardepapieren_service_config_json"
-    echo "33. set_clerk_frontend_nginx_conf"
+    echo "31. set_waardepapieren_service_config_compose_travis_json"
+    echo "32. set_waardepapieren_service_config_compose_json"
+    echo "33. set_waardepapieren_service_config_json"
     echo "# ----------------------------------" 
     echo "#step 4: docker-compose  docker build "
     echo "# ----------------------------------"
@@ -1511,9 +1523,9 @@ read_options(){
         22) set_waardepapieren_service_dockerfile_without_volumes   ;; 
         23) set_mock_nlx_dockerfile                                 ;; 
         30) set_clerk_frontend_nginx_conf                           ;;
-        31) set_clerk_frontend_dockerfile_without_volumes           ;;  
-        32) set_waardepapieren_service_config_compose_json          ;;  
-        33) set_waardepapieren_service_config_json                  ;; 
+        31) set_waardepapieren_service_config_compose_travis_json   ;;  
+        32) set_waardepapieren_service_config_compose_json          ;;
+        33) set_waardepapieren_service_config_json                  ;;                           
         40) docker_compose_min_f_docker                             ;; 
         41) docker_build_image mock_nlx                             ;;  
         42) docker_build_image waardepapieren-service               ;; 
@@ -1540,7 +1552,7 @@ read_options(){
 # Step #3: Trap CTRL+C, CTRL+Z and quit singles
 # ----------------------------------------------
 #trap '' SIGINT SIGQUIT SIGTSTP
- 
+
 # -----------------------------------
 # Step #4: Main logic - infinite loop
 # ------------------------------------

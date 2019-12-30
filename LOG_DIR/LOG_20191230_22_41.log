@@ -1,4 +1,4 @@
-20191230_21_57 - BEGIN JOB:
+20191230_22_41 - BEGIN JOB:
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
@@ -28,8 +28,8 @@ CERT_HOST_IP_WP_SERVICE_HOSTNAME=discipl.westeurope.azurecontainer.io
 #######################
 ## variables
 #######################
-| 20191230_21_57 | nginx.conf|
-| 20191230_21_57 | /home/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/clerk-frontend/nginx |
+| 20191230_22_41 | nginx.conf|
+| 20191230_22_41 | /home/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/clerk-frontend/nginx |
 <code>
 events {
     worker_connections  1024;
@@ -80,37 +80,7 @@ http {
     }
 }
 </code>
-20191230_21_58 - END JOB :
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-| 20191230_21_57 | waardepapieren-config-compose-travis.json|
-| 20191230_21_57 | =/home/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io/waardepapieren-service/configuration |
-<code>
- {
-   "EPHEMERAL_ENDPOINT" : "https://discipl.westeurope.azurecontainer.io:3232",
-   "EPHEMERAL_WEBSOCKET_ENDPOINT" : "wss://discipl.westeurope.azurecontainer.io:3232",
-   "EPHEMERAL_CERT": "/ephemeral-certs/org.crt",
-   "EPHEMERAL_KEY": "/ephemeral-certs/org.key",
-  "NLX_OUTWAY_ENDPOINT" : "http://discipl.westeurope.azurecontainer.io:80",
-  "NLX_CERT": "/certs/org.crt",
-  "NLX_KEY": "/certs/org.key",
-  "LOG_LEVEL": "info",
-  "EPHEMERAL_RETENTION_TIME": 2592001,
-  "PRODUCT_NEED" : "BRP_UITTREKSEL_NEED",
-  "SOURCE_NLX_PATH" : "/brp/basisregistratie/natuurlijke_personen/bsn/{BSN}",
-  "SOURCE_ARGUMENT" : "BSN",
-  "PRODUCT_ACCEPT" : "BRP_UITTREKSEL_ACCEPT",
-  "PRODUCT_NAME" : "Gewaarmerkt digitaal afschrift van gegevens uit de basisregistratie personen (BRP)",
-  "PRODUCT_DESCRIPTION" : "Uittreksel Basis Registratie Persoonsgegevens",
-  "PRODUCT_PURPOSE" : "Bewijs verblijfadres in woonplaats",
-  "SOURCE_DATA_SELECTION" : [
-    {"Burgerservicenummer (BSN)" : "burgerservicenummer"},
-    {"Woonplaats verblijfadres" : "verblijfadres.woonplaats"}
-  ]
-} 
-</code>
-20191230_21_59 - END JOB :
+20191230_22_41 - END JOB :
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
