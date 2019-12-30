@@ -2,27 +2,27 @@ location: westeurope
 name: Discipl_Wigo4it_ACI
 properties:
   containers:
-  - name: waardepapieren-mock-nlx
+  - name: waardepapieren_mock-nlx
     properties:
-      image: boscp08/waardepapieren-mock-nlx:1.0
+      image: boscp08/waardepapieren_mock-nlx:4.0
       resources:
         requests:
           cpu: 1
           memoryInGb: 0.5
       ports:
       - port: 80
-  - name: waardepapieren-service
+  - name: waardepapieren_waardepapieren-service
     properties:
-      image: boscp08/waardepapieren-service:1.0
+      image: boscp08/waardepapieren_waardepapieren-service:4.0
       resources:
         requests:
           cpu: 1
           memoryInGb: 0.5
       ports:
       - port: 3232
-  - name: waardepapieren-clerk-frontend
+  - name: waardepapieren_clerk-frontend
     properties:
-      image: boscp08/waardepapieren-clerk-frontend:1.0
+      image: boscp08/waardepapieren_clerk-frontend:4.0
       resources:
         requests:
           cpu: 1
@@ -34,7 +34,7 @@ properties:
   ipAddress:
     type: Public
     # fqdn wordt: discipl_waardepapieren.westeurope.azurecontainer.io
-    dnsNameLabel: waardepapieren-demo 
+    dnsNameLabel: discipl 
     ports:
     - protocol: tcp
       port: '443' 
