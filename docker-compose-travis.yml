@@ -2,13 +2,10 @@ version: '3'
 services:
   waardepapieren-service:
     volumes:
-      - ./waardepapieren-service/system-test/certs:/certs:ro
-      - ./waardepapieren-service/system-test/ephemeral-certs:/ephemeral-certs:ro
-      - ./waardepapieren-service/configuration/:/app/configuration:ro
+      #- ./waardepapieren-service/system-test/certs:/certs:rw
+      #- ./waardepapieren-service/system-test/ephemeral-certs:/ephemeral-certs:rw
+      - ./waardepapieren-service/configuration/:/app/configuration2:rw  #FAKE
     build: waardepapieren-service/.
-    # network_mode: host
-    #networks:
-    #  test:
     links:
       - mock-nlx
     ports:
@@ -20,30 +17,19 @@ services:
       - NODE_TLS_REJECT_UNAUTHORIZED=0
   clerk-frontend:
     build:
-      #network_mode: host
-    #  networks:
-    #  test:
       context: clerk-frontend/
       args:
         - CERTIFICATE_HOST=http://discipl.westeurope.azurecontainer.io:8880
     links:
       - waardepapieren-service
-        ports:
+    ports:
       - 443:443
       - 8880:8880
-
     healthcheck:
       test: service nginx status
-    volumes:
-      - ./clerk-frontend/nginx/certs:/etc/nginx/certs:ro
+  #  volumes:
+  #    - ./clerk-frontend/nginx/certs:/etc/nginx/certs:rw
   mock-nlx:
     build: mock-nlx/
-    #network_mode: host
-    #networks:
-    #  test:
     ports:
       - 80:80
-    
-    #networks:
-    #test:
-    #driver: bridge

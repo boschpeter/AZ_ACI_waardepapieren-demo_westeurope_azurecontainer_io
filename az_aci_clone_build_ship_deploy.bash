@@ -5,7 +5,6 @@
 #   Description :- This script builds "waardepapieren" containers and ships images to hub.docker.com and beyond to ACI
 #   Modified           Date           Description
 #   --------           --------       -------------------------------------------------
-#   Peter Bosch       21.12.2019      macOs configuration
 #   Peter Bosch       20.12.2019      processing technical dept
 #   Peter Bosch       05.12.2019      Initial version.
 #
@@ -88,7 +87,7 @@ AZURE_PWD=0lifanten
 PROJECT_DIR=$HOME_DIR/Projects/scratch/virtual-insanity    
 GIT_USER=BoschPeter
 GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io  #see befores
-GITHUB_DIR=$PROJECT_DIR/${GIT_REPO}   #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git 
+GITHUB_DIR=$PROJECT_DIR/${GIT_REPO}   
 DOCKER_USER="boscp08"  #NB repository name must be lowercase  Peter!2020
 COMPOSE_BUILD_FLAG=" --build"
 # You build a docker on your laptop and then you are the same as in production. That is why you should use containers btw docker is not fast
@@ -230,6 +229,8 @@ check_check_doublecheck
 ##################################################################
 docker_compose_travis_yml_without_volumes() {
 echo "Running: ${FUNCNAME[0]} $@ "
+enter_cont
+
 TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=docker-compose-travis.yml 
 enter_touch ${FUNCNAME[0]} $@
@@ -278,7 +279,7 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-clerk_frontend_dockerfile_with_volumes() {
+set_clerk_frontend_dockerfile_with_volumes() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
 TT_INSPECT_FILE=Dockerfile 
@@ -310,7 +311,8 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-mock_nlx_dockerfile() {  
+
+set_mock_nlx_dockerfile() {  
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/mock-nlx
 TT_INSPECT_FILE=Dockerfile 
@@ -332,7 +334,7 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-clerk_frontend_dockerfile_without_volumes() {
+set_clerk_frontend_dockerfile_without_volumes() {
 echo "Running: ${FUNCNAME[0]} $@ "
 TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
 TT_INSPECT_FILE=Dockerfile 
@@ -372,7 +374,7 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-clerk_frontend_nginx_conf() {
+set_clerk_frontend_nginx_conf() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend/nginx
 TT_INSPECT_FILE=nginx.conf
@@ -501,7 +503,7 @@ check_check_doublecheck
 # Arguments: 
 # Return:  
 ##################################################################
-waardepapieren_service_config_compose_travis_json() {
+set_clerk_frontend_dockerfile_without_volumes() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY==${GITHUB_DIR}/waardepapieren-service/configuration
 TT_INSPECT_FILE=waardepapieren-config-compose-travis.json
@@ -538,7 +540,7 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-waardepapieren_service_config_compose_json() {
+set_waardepapieren_service_config_compose_json() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service/configuration
 TT_INSPECT_FILE=waardepapieren-config-compose.json
@@ -575,7 +577,7 @@ check_check_doublecheck
 # Arguments: 
 # Return: 
 ##################################################################
-waardepapieren_service_config_json() {
+set_waardepapieren_service_config_json() {
 echo "Running: ${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}/waardepapieren-service/configuration
 TT_INSPECT_FILE=waardepapieren-config.json
@@ -671,7 +673,6 @@ tags: null
 type: Microsoft.ContainerInstance/containerGroups" > ${TT_INSPECT_FILE} 
 
 check_check_doublecheck
-
 }
 
 # -----------------------------------
@@ -785,7 +786,7 @@ TT_INSPECT_FILE=""
 ##################################################################
 enter_inspect() {
 clear
-ß
+
 if [ -f "${TT_INSPECT_FILE}" ]; then
  
 echo "| ${LOG_START_DATE_TIME} | ${TT_INSPECT_FILE}|"                                >> $LOG_FILE  
@@ -924,15 +925,15 @@ echo "Running:${FUNCNAME[0]} $@"
 #boscp08@boscp08-HP-Compaq-8510p:~/Dropbox/Github$ git init
 #Initialized empty Git repository in /home/boscp08/Dropbox/Github/.git/
 #  sudo apt install git 
+# https://www.howtoforge.com/tutorial/install-git-and-github-on-ubuntu/
 git init
 
-git config --global credential.helper store
-git config user.name "BoschPeter"
+#git config --global credential.helper store
+#git config user.name "BoschPeter"
 
 git config --global user.email "bosch.peter@icloud.com"
-git config --global user.name "boschpeter"
-
-git config --global user.password "Peter\....ß"
+git config --global user.name "BoschPeter"
+git config --global user.password "Peter\!2020"
 
 # git config --global user.name "ezahr"
 #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git
@@ -953,8 +954,14 @@ git init
 #Initialized empty Git repository in /home/boscp08/Dropbox/Github/.git/
 git config --global credential.helper store
 git config --global user.email "bosch.peter@icloud.com"
-git config --global user.name "BoschPeter"
-git config --global user.password "Peter\!..."  #mind macos keyring
+#git config --global user.name "BoschPeter"
+git config --global user.name "Ezahr"
+git config --global user.password "Peter\!2020"  #mind macos keyring
+git config --list
+git config --get remote.origin.Uittreksel
+git config credential.username --global "Ezahr"
+git config credential.password --global "Peter\!2020"
+
 }
 
 ##################################################################
@@ -1254,6 +1261,28 @@ create_logfile_footer
 #   14) restart_azure_container_group ;;
 }
 
+
+##################################################################
+# Purpose: Firefox Start Browser From The Command Line
+# Arguments: 
+# Return: website  
+###############################################################
+
+bookmark_open() {
+
+#URL=https://github.com/BoschPeter/$GIT_REPO
+
+if [ `uname` = 'Linux' ]
+  then  /usr/bin/firefox  $1
+  #echo "linux"
+fi  
+
+if  [ `uname` = 'Darwin' ]
+    then  open -a Firefox $1
+   #echo "MacOs"
+fi
+}
+
 ##################################################################
 # Purpose: Procedure to save the program to the LOG_FILE
 # Arguments: 
@@ -1290,6 +1319,7 @@ echo "***  AZURE ACI-resourcegroup=${AZ_RESOURCE_GROUP}"
 echo "***" 
 create_logdir
 create_directories
+create_logfile_header
 echo "#######################"                                                >> $LOG_FILE
 echo "## variables"                                                           >> $LOG_FILE
 echo "#######################"                                                >> $LOG_FILE
@@ -1317,7 +1347,7 @@ echo "#######################"                                                >>
 echo "## variables"                                                           >> $LOG_FILE
 echo "#######################"                                                >> $LOG_FILE
 
-SS
+
 ##################################################################
 # Purpose: Display all variables
 # Arguments: 
@@ -1374,7 +1404,7 @@ fi
 
 
 ##################################################################
-# Purpose: Display menu
+# Purpose: Display MAIN-MENU
 # Arguments: 
 # Return: variables
 ##################################################################
@@ -1399,7 +1429,7 @@ then
 #echo "A menu is nothing but a list of commands presented to a user by a shell script"
 
 # ----------------------------------
-# Step #2: User defined function
+# Step: User defined function
 # ----------------------------------
 pause(){
   read -p "Press [Enter] key to continue..." fackEnterKey
@@ -1410,73 +1440,112 @@ show_menus() {
 	echo "~~~~~~~~~~~~~~~~~~~~~"	
 	echo " M A I N - M E N U"
 	echo "~~~~~~~~~~~~~~~~~~~~~"
-	echo "1. docker_build_image mock_nlx ${DOCKER_VERSION_TAG}"
-    echo "2. docker_build_image waardepapieren-service ${DOCKER_VERSION_TAG}"
-    echo "3. docker_build_image clerk-frontend ${DOCKER_VERSION_TAG}"
-    echo "4. Reset (docker system prune -a)"
-  	echo "5. reload az_aci_clone_build_ship_deploy.bash"
-	  echo "6. open -a Firefox 'https://hub.docker.com/?ref=login' boscp08 Peter!...."
-	  echo "7. open -a Firefox 'https://portal.azure.com/#home' bosch.peter@outlook.com 0l..ten"
-    echo "8. open -a Firefox https://$CERT_HOST_IP:443  " #hope the clerk frontend will be stable "
-  	echo "9. open -a Firefox https://github.com/BoschPeter/$GIT_REPO "
-    echo "10..) az login -u bosch.peter@outlook.com"
-    echo "11..) delete_azure_resource_group $AZ_RESOURCE_GROUP "
-    echo "12..) create_azure_resource_group $AZ_RESOURCE_GROUP"
-    echo "13..) create_azure_container_group $AZ_RESOURCE_GROUP"
-    echo "14..) restart_azure_container_group $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
-	echo "15. backup scripts"
-	echo "16. the whole sjebang"
-	echo "17 Exit"
+    echo "# ----------------------------------"
+    echo "Step 1: prune "
+    echo "# ----------------------------------"
+    echo "#10. Reset (docker system prune-a)"
+    echo "# ----------------------------------"
+    echo "Step 2:   Dockerfile setters"
+    echo "# ----------------------------------"
+    echo "20. set_docker_compose_travis_yml_without_volumes"
+    echo "21. set_clerk_frontend_dockerfile_without_volumes" 
+    echo "22. set_waardepapieren_service_dockerfile_without_volumes"
+    echo "23. set_mock_nlx_dockerfile"    
+    echo "# ----------------------------------"
+    echo "#Step 3 : Networking setters" 
+    echo "# ----------------------------------" 
+    echo "30. set_clerk_frontend_nginx_conf"
+    echo "31. set_waardepapieren_service_config_compose_json"
+    echo "32. set_waardepapieren_service_config_json"
+    echo "33. set_clerk_frontend_nginx_conf"
+    echo "# ----------------------------------" 
+    echo "#step 4: docker-compose  docker build "
+    echo "# ----------------------------------"
+    echo "40. docker_compose -f docker-compose-travis.yml up $COMPOSE_BUILD_FLAG" 
+    echo "41. docker_build_image $MOCK_NLX_IMAGE"
+    echo "42. docker_build_image $SERVICE_IMAGE "
+    echo "43. docker_build_image $CLERK_FRONTEND_IMAGE "
+    echo "44. docker_tag_images $DOCKER_VERSION_TAG"
+    echo "45. docker_push_images $DOCKER_VERSION_TAG"
+    echo "# ----------------------------------"
+    echo "#step 5: azure  "
+    echo "# ----------------------------------"
+    echo "50. delete_azure_resource_group $AZ_RESOURCE_GROUP "
+    echo "51. create_azure_resource_group $AZ_RESOURCE_GROUP"
+    echo "52. create_azure_container_group $AZ_RESOURCE_GROUP"
+    echo "53. restart_azure_container_group $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
+    echo "# ----------------------------------"
+    echo "#step 6 check check triple check  clone build ship deploy "
+    echo "# ----------------------------------" 
+    echo "60. https://github.com/BoschPeter/$GIT_REPO "   
+    echo "61. https://hub.docker.com/?ref=login' boscp08 Peter!...."   #Ship
+  	echo "62. https://portal.azure.com/#home' "
+    echo "63. https://$CERT_HOST_IP:443  " #hope the clerk frontend will be stable "
+    echo "# ----------------------------------"
+  	echo "# step 9  miscelaneous "
+    echo "# ----------------------------------"
+    echo "90. az login -u $AZURE_USER  " 
+    echo "91. docker login -u $DOCKER_USER " 
+    echo "92. the whole sjebang"
+    echo "93. backup scripts"
+    echo "99. Exit"
 }
 # read input from the keyboard and take a action
 # invoke the one() when the user select 1 from the menu option.
 # invoke the two() when the user select 2 from the menu option.
-# Exit when user the user select 3 form the menu option.
-#https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/Discipl_Wigo4it_ACI/providers/Microsoft.ContainerInstance/containerGroups/Discipl_Wigo4it_ACI/containers
+# Exit when user the user select 100 form the menu option.
 
 read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 17] " choice
+	read -p "Enter choice [ 1 - 99] " choice
 	case $choice in
-		1) docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  ;;
-    2) docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  ;;
-    3) docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  ;;
-    4) docker_system_prune ;;
-		5) . az_aci_clone_build_ship_deploy.bash ;;
-		6) open -a Firefox 'https://hub.docker.com/?ref=login' ;;
-    7) open -a Firefox 'https://portal.azure.com/#home' ;;
-		8) open -a Firefox https://$CERT_HOST_IP:443 ;;
-		9) open -a Firefox https://github.com/BoschPeter/$GIT_REPO ;;
-		10) az login -u bosch.peter@outlook.com -p 0lifanten ;;
-	  11) delete_azure_resource_group  ;;
-    12) create_azure_resource_group  ;;
-    13) create_azure_container_group ;;
-    14) restart_azure_container_group ;;
-    15) write_az_clone_build_ship_deploy_bash ;;
-		16) sjebang ;;
-		17) exit 0;;
-		*) echo -e "${RED}Error...${STD}" && sleep 2
+        10) docker_system_prune                                     ;;  
+        20) set_docker_compose_travis_yml_without_volumes           ;;  
+        21) set_clerk_frontend_dockerfile_without_volumes           ;;
+        22) set_waardepapieren_service_dockerfile_without_volumes   ;; 
+        23) set_mock_nlx_dockerfile                                 ;; 
+        30) set_clerk_frontend_nginx_conf                           ;;
+        31) set_clerk_frontend_dockerfile_without_volumes           ;;  
+        32) set_waardepapieren_service_config_compose_json          ;;  
+        33) set_waardepapieren_service_config_json                  ;; 
+        40) docker_compose_min_f_docker                             ;; 
+        41) docker_build_image mock_nlx                             ;;  
+        42) docker_build_image waardepapieren-service               ;; 
+        33) docker_build_image clerk-frontend                       ;; 
+        50) delete_azure_resource_group                             ;;
+        51) create_azure_resource_group                             ;; 
+        52) create_azure_resource_group                             ;; 
+        53) restart_azure_container_group                           ;; 
+        60) bookmark_open https://github.com/BoschPeter/$GIT_REPO   ;;
+        61) bookmark_open https://hub.docker.com/?ref=login         ;; 
+        62) bookmark_open https://portal.azure.com/\#home           ;; 
+        63) bookmark_open https://$CERT_HOST_IP:443                 ;; 
+        #64) bookmark_open https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/${AZ_RESOURCE_GROUP}/providers/Microsoft.ContainerInstance/containerGroups/$AZ_RESOURCE_GROUP/containers'  ;;
+        90) azure_login                                             ;; 
+        91) docker_login                                            ;; 
+        92) the_whole_sjebang                                       ;; 
+        93) write_az_clone_build_ship_deploy_bash                   ;; 
+        99) Exit                                                    ;;
+		*) echo -e "${RED}Error...${STD}" && sleep 1
 	esac
 }
- 
+
 # ----------------------------------------------
 # Step #3: Trap CTRL+C, CTRL+Z and quit singles
 # ----------------------------------------------
-trap '' SIGINT SIGQUIT SIGTSTP
+#trap '' SIGINT SIGQUIT SIGTSTP
  
 # -----------------------------------
 # Step #4: Main logic - infinite loop
 # ------------------------------------
 while true
 do
- 
 	show_menus
 	read_options
-
 done
 
 fi
-ß
+
 ##################################################################
 # Purpose: write code
 # Arguments: 
@@ -1506,10 +1575,10 @@ echo ""
 clear
 fi
 
+create_logfile_footer
 echo
 echo "hope the run will be ok!"
 echo
-
 
 echo " cd back into " ${GITHUB_DIR}
 cd ${GITHUB_DIR}
@@ -1518,136 +1587,15 @@ clear
 
 # eof
 
-##!/bin/bash
-## A menu driven shell script sample template 
-### ----------------------------------
-## Step #1: Define variables
-## ----------------------------------
-#EDITOR=nano
-#PASSWD=/etc/passwd
-#RED='\033[0;41;30m'
-#STD='\033[0;0;39m'
-#
-#echo "A menu is nothing but a list of commands presented to a user by a shell script"
-#sleep 1
-# . az_aci_clone_build_ship_deploy.bash
-# PROMPT=true 
-## ----------------------------------
-## Step #2: User defined function
-## ----------------------------------
-#pause(){
-#  read -p "Press [Enter] key to continue..." fackEnterKey
-#} 
-## function to display menus
-#show_menus() {
-#	clear
-#	echo "~~~~~~~~~~~~~~~~~~~~~"	
-#	echo " M A I N - M E N U"
-#	echo "~~~~~~~~~~~~~~~~~~~~~"
-#    echo "# ----------------------------------"
-#    echo "Step 1: prune "
-#    echo "# ----------------------------------"
-#    echo "#10. Reset (docker system prune-a)"
-#    echo "# ----------------------------------"
-#    echo "Step 2:   Dockerfile setters"
-#    echo "# ----------------------------------"
-#    echo "20. SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME "
-#    echo "21. SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME"
-#    echo "22. SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME"
-#    echo "23. SET_DOCEKERFILE_WAARDEPAPIEREN_WITHOUT_VOLUME"
-#    echo "# ----------------------------------"
-#    echo "#Step 3 : Networking setters" 
-#    echo "# ----------------------------------" 
-#    echo "30. SET_CLERK_FRONTEND_NGINX_CONF"
-#    echo "31. SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE_TRAVIS_JSON"
-#    echo "32. SET_WAARDEPAPIEREN_CONFIG_COMPOS_JSON"
-#    echo "33.SET_WAARDEPAPIEREN_CONFIG_JSON"
-#    echo "# ----------------------------------" 
-#    echo "#step 4: docker-compose  docker build "
-#    echo "# ----------------------------------"
-#    echo "40. docker_compose "
-#    echo "41. docker_build_image mock_nlx ${DOCKER_VERSION_TAG}"
-#    echo "42. docker_build_image waardepapieren-service ${DOCKER_VERSION_TAG}"
-#    echo "33. docker_build_image clerk-frontend ${DOCKER_VERSION_TAG}"
-#    echo "# ----------------------------------"
-#    echo "#step 5: azure  "
-#    echo "# ----------------------------------"
-#    echo "50) delete_azure_resource_group $AZ_RESOURCE_GROUP "
-#    echo "51..) create_azure_resource_group $AZ_RESOURCE_GROUP"
-#    echo "52..) create_azure_container_group $AZ_RESOURCE_GROUP"
-#    echo "53..) restart_azure_container_group $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
-#    echo "# ----------------------------------"
-#    echo "#step 6 check check triple check  clone build ship deploy "
-#    echo "# ----------------------------------" 
-#    echo "60. open -a Firefox https://github.com/BoschPeter/$GIT_REPO "    #clone
-#    #echo "61. open -a Firefox https://github.com/BoschPeter/$GIT_REPO "    #clone
-#    echo "62. open -a Firefox 'https://hub.docker.com/?ref=login' boscp08 Peter!...."   #Ship
-#	echo "63. open -a Firefox 'https://portal.azure.com/#home' bosch.peter@outlook.com 0l..ten"
-#    echo "64. open -a Firefox https://$CERT_HOST_IP:443  " #hope the clerk frontend will be stable "
-#    echo "# ----------------------------------"
-#	echo "#step 9  miscelaneous "
-#    echo "# ----------------------------------"
-#    echo "90..) az login -u bosch.peter@outlook.com" 
-#    echo "91. the whole sjebang"
-#    echo "92. backup scripts"
-#	echo "99. reload az_aci_clone_build_ship_deploy.bash"
-#    echo "100 Exit"
-#}
-## read input from the keyboard and take a action
-## invoke the one() when the user select 1 from the menu option.
-## invoke the two() when the user select 2 from the menu option.
-## Exit when user the user select 3 form the menu option.
-##https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/Discipl_Wigo4it_ACI/providers/Microsoft.ContainerInstance/containerGroups/Discipl_Wigo4it_ACI/containers
-#
-#read_options(){
-#	local choice
-#	read -p "Enter choice [ 1 - 99] " choice
-#	case $choice in
-#        10) docker_system_prune        ;;  #Reset (docker system prune-a)"
-#        20) docker_compose_travis_yml_without_volumes        ;;  #SET_DOCKERCOMPOSE_TRAVIS_WITHOUT_VOLUME 
-#        21) clerk_frontend_dockerfile_with_volumes      ;;  #SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME
-#        22) clerk_frontend_dockerfile_without_volumes        ;;  #SET_DOCKERFILE_CLERK_FRONTEND_WITHOUT_VOLUME
-#        23) waardepapieren_service_dockerfile_without_volumes       ;;  #SET_DOCEKERFILE_WAARDEPAPIEREN_WITHOUT_VOLUME
-#        30) clerk_frontend_nginx_conf       ;;  #SET_CLERK_FRONTEND_NGINX_CONF
-#        31) waardepapieren_service_config_compose_travis_json        ;;  #SET_WAARDEPAPIEREN_SERVICE_CONFIG_COMPOSE_TRAVIS_JSON
-#        32) waardepapieren_service_config_compose_json        ;;  #SET_WAARDEPAPIEREN_CONFIG_COMPOS_JSON
-#        33) waardepapieren_service_config_json        ;;  #SET_WAARDEPAPIEREN_CONFIG_JSON
-#        40) docker_compose_min_f_docker      ;;  #docker_compose 
-#        41) docker_build_image mock_nlx ${DOCKER_VERSION_TAG}       ;;  #docker_build_image mock_nlx ${DOCKER_VERSION_TAG}
-#        42) docker_build_image waardepapieren-service ${DOCKER_VERSION_TAG}        ;;  #docker_build_image waardepapieren-service ${DOCKER_VERSION_TAG}
-#        33) docker_build_image clerk-frontend ${DOCKER_VERSION_TAG}       ;;  #docker_build_image clerk-frontend ${DOCKER_VERSION_TAG}
-#        50) delete_azure_resource_group          ;;  #delete_azure_resource_group $AZ_RESOURCE_GROUP 
-#        51) create_azure_resource_group          ;;  #create_azure_resource_group $AZ_RESOURCE_GROUP
-#        52) create_azure_resource_group          ;;  #create_azure_container_group $AZ_RESOURCE_GROUP
-#        53) restart_azure_container_group        ;;  #restart_azure_container_group $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub
-#        60) open -a Firefox https://github.com/BoschPeter/$GIT_REPO          ;;
-#        61) open -a Firefox 'https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/${AZ_RESOURCE_GROUP}/providers/Microsoft.ContainerInstance/containerGroups/$AZ_RESOURCE_GROUP/containers'       ;;
-#        62) open -a Firefox 'https://hub.docker.com/?ref=login' -p boscp08 -u Peter!2020  ;; 
-#	    63) open -a Firefox 'https://portal.azure.com/#home' ;; # bosch.peter@outlook.com 0l..ten ;;tal.azure.com/#home' bosch.peter@outlook.com 0l..ten
-#        64) open -a Firefox https://$CERT_HOST_IP:443  ;; " #hope the clerk frontend will be stable after 10 minutes or so... understatement "
-#        90) az login -u bosch.peter@outlook.com  -p 0lifanten ;;  #az login -u bosch.peter@outlook.com" 
-#        92) sjebang         ;;  #the whole sjebang"
-#        93) write_az_clone_build_ship_deploy_bash  ;;  #backup scripts"
-#	    99) . az_aci_clone_build_ship_deploy.bash 
-#        100) Exit ;;
-#		*) echo -e "${RED}Error...${STD}" && sleep 2
-#	esac
-#}
-# 
-## ----------------------------------------------
-## Step #3: Trap CTRL+C, CTRL+Z and quit singles
-## ----------------------------------------------
-#trap '' SIGINT SIGQUIT SIGTSTP
-# 
-## -----------------------------------
-## Step #4: Main logic - infinite loop
-## ------------------------------------
-#while true
-#do
-# 
-#	show_menus
-#	read_options
-#done
+
+##################################################################
+# Purpose: azure_login
+# Arguments: 
+# Return: variables
+##################################################################
+azure_login() {
+
+az login -u bosch.peter@outlook.com -p 0lifanten 
 
 # //////////////////////////////////////////////////////////////////////////////////////////
 #  az account list
@@ -1697,12 +1645,17 @@ clear
 #https://docs.microsoft.com/en-us/azure/virtual-machines/azure-cli-arm-commands
 #https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest
 
-# az group list
-#create_logfile_footer
+}
 
 
-
-
+##################################################################
+# Purpose: docker_login
+# Arguments: 
+# Return: variables
+##################################################################
+docker_login () {
+docker login -u $DOCKER_USER  -p $DOCKER_PWD 
+# docker container 
 #  attach      Attach local standard input, output, and error streams to a running container
 #  commit      Create a new image from a container's changes
 #  cp          Copy files/folders between a container and the local filesystem
@@ -1744,4 +1697,5 @@ clear
 #  push        Push an image or a repository to a registry
 #  rm          Remove one or more images
 #  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAG
-#  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+#  save        Save one or more images to a tar archive (streamed to STDOUT by default)\
+}
