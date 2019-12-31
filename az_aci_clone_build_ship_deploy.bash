@@ -1623,7 +1623,7 @@ show_menus() {
   echo "63. https://$CERT_HOST_IP:443                 " 
   echo "64. pim https://waardepapieren-demo.discipl.org BSN=663678651" 
 	echo "#  sjebang "
-  echo "90 the_whole_sjebang                                        "
+  echo "90 the_whole_sjebang                                        "39
   echo "99. Exit"
 }
 # read input from the keyboard and take a action
