@@ -9,7 +9,11 @@ ADD public /app/public
 ADD src /app/src
 ARG CERTIFICATE_HOST
 ENV REACT_APP_CERTIFICATE_HOST=http://discipl.westeurope.azurecontainer.io:8880
-ENV TZ=Europe/Amsterdam
+
+
+
+
+
 RUN npm run build
 
 FROM nginx:1.15.8

@@ -1,0 +1,42 @@
+20191231_12_08 - BEGIN JOB:
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+<code>
+***  Welcome to  docker build  20191231_12_08 
+#######################
+## variables
+#######################
+PROJECT_DIR=/Users/boscp08/Projects/scratch/virtual-insanity
+GIT_USER=BoschPeter
+GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
+GITHUB_DIR=/Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
+DOCKER_USER=boscp08
+COMPOSE_BUILD_FLAG= --build
+MOCK_NLX_IMAGE=waardepapieren_mock-nlx
+SERVICE_IMAGE=waardepapieren_waardepapieren-service
+CLERK_FRONTEND_IMAGE=waardepapieren_clerk-frontend
+DOCKERHUB_MOCK_NLX_IMAGE=waardepapieren-mock-nlx
+DOCKERHUB_SERVICE_IMAGE=waardepapieren-waardepapieren-service
+DOCKERHUB_CLERK_FRONTEND_IMAGE=waardepapieren-clerk-frontend
+DOCKER_VERSION_TAG=4.0
+AZ_RESOURCE_GROUP=Discipl_Wigo4it_DockerGroup4
+AZ_DNSNAMELABEL=discipl
+TARGET_HOST=azure_container_instance
+AZ_TLD=azurecontainer.io
+TIMEZONE=
+CERT_HOST_IP=discipl.westeurope.azurecontainer.io
+CERT_HOST_IP_WP_SERVICE_HOSTNAME=discipl.westeurope.azurecontainer.io
+#######################
+## variables
+#######################
+</code>
+20191231_12_08 - BEGIN JOB:
+-----------------------------------------------------------------------------
+docker_compose_images
+-----------------------------------------------------------------------------
+docker-compose -f docker-compose-travis.yml up  --build
+20191231_12_08 - END JOB :
+-----------------------------------------------------------------------------
+docker_compose_images
+-----------------------------------------------------------------------------

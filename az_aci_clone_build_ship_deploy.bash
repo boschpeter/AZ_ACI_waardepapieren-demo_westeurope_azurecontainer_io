@@ -153,9 +153,8 @@ fi
 
 # ----------------------------------
 # special Dockerfile commands
-# ---
+# ---------------------------
 #TIMEZONE="ENV TZ=Europe/Amsterdam"
-TIMEZONE="halli hallo"
 #APT_GET_UPDATE="RUN apt-get update"
 #APT_GET_INSTALL_NET_TOOLS="RUN apt-get install net-tools"
 #APT_GET_INSTALL_IPUTILS_PING="RUN apt-get install iputils-ping"
@@ -297,11 +296,15 @@ RUN mkdir /app
 ADD index.js package.json package-lock.json /app/
 WORKDIR /app
 $TIMEZONE
+$APT_GET_UPDATE
+$APT_GET_INSTAL
+$APT_GET_INSTALL_IPUTILS_PING
+
 RUN npm install --production" > ${TT_INSPECT_FILE} 
 
 check_check_doublecheck  ${FUNCNAME[0]} $@
 }
-
+3
 ##################################################################
 # Purpose: set clerk-frontend Dockerfile
 # Arguments: 
@@ -465,7 +468,10 @@ ADD .babelrc package.json package-lock.json /app/
 ADD src/* app/src/
 ADD configuration/* app/configuration/
 ENV WAARDEPAPIEREN_CONFIG /app/configuration/waardepapieren-config.json
-ENV TZ=Europe/Amsterdam
+$TIMEZONE
+$APT_GET_UPDATE
+$APT_GET_INSTAL
+$APT_GET_INSTALL_IPUTILS_PING
 WORKDIR /app
 RUN npm install --production
 CMD npm start"   > ${TT_INSPECT_FILE} 
@@ -505,10 +511,11 @@ ADD configuration/waardepapieren-config-compose.json /app/configuration
 ADD configuration/waardepapieren-config-compose-travis.json /app/configuration
 ADD configuration/waardepapieren-config.json /app/configuration
 ENV WAARDEPAPIEREN_CONFIG /app/configuration/waardepapieren-config.json
-ENV TZ=Europe/Amsterdam
-RUN apt-get update 
-RUN apt-get install -y iputils-ping
-RUN apt-get install -y net-tools
+
+$TIMEZONE
+$APT_GET_UPDATE
+$APT_GET_INSTAL
+$APT_GET_INSTALL_IPUTILS_PING
 
 RUN npm install --production
 CMD npm start"  > ${TT_INSPECT_FILE} 
@@ -1063,7 +1070,11 @@ docker stop  $(docker ps -a -q)
 ##################################################################
 docker_images_remove() {
 echo "Running:${FUNCNAME[0]} $@"
+echo "docker rm $(docker ps -a -q) && docker rmi $(docker images -q)"   >> ${LOG_DIR}
+
 docker rm $(docker ps -a -q) && docker rmi $(docker images -q)
+create_logfile_footer ${FUNCNAME[0]} $@
+
 }
 
 ##################################################################
@@ -1071,9 +1082,15 @@ docker rm $(docker ps -a -q) && docker rmi $(docker images -q)
 # Arguments: 
 # Return: 
 ##################################################################
-docker_containers_prune() {
+docker_container_prune() {
 echo "Running:${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
+
+echo "docker container prune -a "  >> ${LOG_DIR}
 docker container prune -a   
+
+create_logfile_footer ${FUNCNAME[0]} $@
+
 }
 
 ##################################################################
@@ -1089,7 +1106,7 @@ echo "docker-compose -f docker-compose-travis.yml up $COMPOSE_BUILD_FLAG"     >>
 
 docker-compose -f docker-compose-travis.yml up $COMPOSE_BUILD_FLAG
 
-create_logfile_footer
+create_logfile_footer  ${FUNCNAME[0]} $@
 
 }
 #################################################################
@@ -1110,23 +1127,6 @@ cd ${GITHUB_DIR}/$1
 docker build -t $2/$3 .  #mind the dot!
 cd ${GITHUB_DIR}  #cd -
 }
-
-#################################################################
-# Purpose:  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
-# Arguments: docker_tag boscp08  waardepapieren_mock-nlx 4.0 
-# Return: image
-##################################################################
-docker_tag_image() {
-echo "Running:${FUNCNAME[0]} $@"
-create_logfile_header ${FUNCNAME[0]} $@
-#docker tag waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG
-#docker tag ${DOCKER_USER}/$MOCK_NLX_IMAGE:latest ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}
-arg1=$1 #${DOCKER_USER}
-arg2=$2 #${MOCK_NLX_IMAGE}
-arg3=$3 #${DOCKERHUB_MOCK_NLX_IMAGE}
-arg4=$4 #${DOCKER_VERSION_TAG}
-docker tag $1/$2:latest $1/$3:$4
-}  
 
 
 ##################################################################
@@ -1151,6 +1151,7 @@ echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 cd ${GITHUB_DIR}/clerk-frontend
 docker build -t ${DOCKER_USER}/clerk-frontend .  #NB [.] periode means from this directory 
+create_logfile_footer ${FUNCNAME[0]} $@
 }
 
 ##################################################################
@@ -1164,7 +1165,26 @@ create_logfile_header ${FUNCNAME[0]} $@
 docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+create_logfile_footer ${FUNCNAME[0]} $@
 }
+
+
+#################################################################
+# Purpose:  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+# Arguments: docker_tag boscp08  waardepapieren_mock-nlx 4.0 
+# Return: image
+##################################################################
+docker_tag_image() {
+echo "Running:${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
+#docker tag waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG
+#docker tag ${DOCKER_USER}/$MOCK_NLX_IMAGE:latest ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}
+arg1=$1 #${DOCKER_USER}
+arg2=$2 #${MOCK_NLX_IMAGE}
+arg3=$3 #${DOCKERHUB_MOCK_NLX_IMAGE}
+arg4=$4 #${DOCKER_VERSION_TAG}
+docker tag $1/$2:latest $1/$3:$4
+}  
 
 ##################################################################
 # Purpose:  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
@@ -1178,7 +1198,28 @@ docker_tag_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}
 docker_tag_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_tag_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
 docker images | grep  ${DOCKER_VERSION_TAG}   
+docker images | grep  ${DOCKER_VERSION_TAG}      >> ${LOG_DIR}
+create_logfile_footer ${FUNCNAME[0]} $@
 }
+
+
+#################################################################
+# Purpose:  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+# Arguments: docker_tag boscp08  waardepapieren_mock-nlx 4.0 
+# Return: image
+##################################################################
+docker_push_image() {
+echo "Running:${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
+#docker tag waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG
+#docker tag ${DOCKER_USER}/$MOCK_NLX_IMAGE:latest ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}
+arg1=$1 #${DOCKER_USER}
+arg2=$2 #${MOCK_NLX_IMAGE}
+arg3=$3 #${DOCKERHUB_MOCK_NLX_IMAGE}
+arg4=$4 #${DOCKER_VERSION_TAG}
+docker tag $1/$2:latest $1/$3:$4
+}  
+
 
 ##################################################################
 # Purpose:  Push an image or a repository to a registry
@@ -1192,7 +1233,6 @@ docker_push_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}
 docker_push_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_push_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG} 
 create_logfile_footer
-
 }
 
 ##################################################################
@@ -1200,7 +1240,22 @@ create_logfile_footer
 # Arguments: docker push -t boscp08/waardepapieren_service   
 # Return: Ship to docker registry docker.hub.com
 ##################################################################
-docker_commit_containers() {
+docker_commit () {
+echo "Running:${FUNCNAME[0]} $@"
+#create_logfile_header ${FUNCNAME[0]} $@
+#docker commit ${MOCK_NLX_IMAGE} ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}  
+##docker commit ${SERVICE_IMAGE} ${DOCKER_USER}/${DOCKERHUB_SERVICE_IMAGE}:${DOCKER_VERSION_TAG} 
+#docker commit ${CLERK_FRONTEND_IMAGE} ${DOCKER_USER}/${DOCKER_HUB_CLERK_FRONTEND_IMAGE}:${DOCKER_VERSION_TAG}          
+create_logfile_footer
+}
+
+
+##################################################################
+# Purpose:  Push an image or a repository to a registry
+# Arguments: docker push -t boscp08/waardepapieren_service   
+# Return: Ship to docker registry docker.hub.com
+##################################################################
+docker_commit_containers () {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 docker commit ${MOCK_NLX_IMAGE} ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}  
@@ -1246,13 +1301,14 @@ enter_cont
 # Arguments: 
 # Return: 
 ##################################################################
-create_azure_container_group() {
+create_azure_containergroup() {
 echo "-- Running:${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
+enter_cont
 cd ${GITHUB_DIR}
 #az container create --resource-group $AZ_RESOURCE_GROUP --file deploy-aci.yaml
 az container create --resource-group $1 --file deploy-aci.yaml
-
 enter_cont
 # https://docs.microsoft.com/en-us/azure/container-instances/container-instances-multi-container-yaml
 # View deployment state
@@ -1266,6 +1322,7 @@ enter_cont
 ##################################################################
 az_container_show() {
 echo "-- Running:${FUNCNAME[0]} $@"  
+create_logfile_header ${FUNCNAME[0]} $@
 #az container show --resource-group ${AZ_RESOURCE_GROUP} --name $2 --output table
 az container show --resource-group $1--name $2 --output table
 }
@@ -1290,32 +1347,32 @@ az container restart --resource-group ${AZ_RESOURCE_GROUP}
 the_whole_sjebang() {
 create_logfile_header
 
-write_az_clone_build_ship_deploy_bash   
-#docker_system_prune -a
-set_docker_compose_travis_yml_without_volumes
-set_clerk_frontend_dockerfile_without_volumes
-set_waardepapieren_service_dockerfile_without_volumes
-set_mock_nlx_dockerfile
+docker login -u $DOCKER_USER -p $DOCKER_PWD  
+az login -u $AZURE_USER -p $AZURE_PWD  
 
-docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+enter_cont
 
-docker_tag_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKERHUB_MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_tag_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_tag_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_compose_images
+docker_tag_images
+docker_push_images
 
-docker login -u $DOCKER_USER -p $DOCKER_PWD  # temporarily
-docker_push_image  ${DOCKER_USER} ${DOCKERHUB_MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_push_image  ${DOCKER_USER} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_push_image  ${DOCKER_USER} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_build_image waardepapieren-service ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_tag_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKERHUB_MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_tag_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_tag_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
 
-az login -u $AZURE_USER -p $AZURE_PWD  # temporarilyß
+#docker_push_image  ${DOCKER_USER} ${DOCKERHUB_MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_push_image  ${DOCKER_USER} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
+#docker_push_image  ${DOCKER_USER} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+
 delete_azure_resourcegroup  $AZ_RESOURCE_GROUP
 create_azure_resourcegroup  $AZ_RESOURCE_GROUP
-create_azure_container_group $AZ_RESOURCE_GROUP
+create_azure_containergroup $AZ_RESOURCE_GROUP
 create_logfile_footer
-#   14) restart_azure_containergroup ;;
+
+
 }
 
 
