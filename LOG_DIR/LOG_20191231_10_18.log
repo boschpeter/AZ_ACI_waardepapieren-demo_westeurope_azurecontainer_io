@@ -1,0 +1,73 @@
+20191231_10_18 - BEGIN JOB:
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+***  Welcome to  docker build  20191231_10_18 
+#######################
+## variables
+#######################
+PROJECT_DIR=/Users/boscp08/Projects/scratch/virtual-insanity
+GIT_USER=BoschPeter
+GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
+GITHUB_DIR=/Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
+DOCKER_USER=boscp08
+COMPOSE_BUILD_FLAG= --build
+MOCK_NLX_IMAGE=waardepapieren_mock-nlx
+SERVICE_IMAGE=waardepapieren_waardepapieren-service
+CLERK_FRONTEND_IMAGE=waardepapieren_clerk-frontend
+DOCKERHUB_MOCK_NLX_IMAGE=waardepapieren-mock-nlx
+DOCKERHUB_SERVICE_IMAGE=waardepapieren-waardepapieren-service
+DOCKERHUB_CLERK_FRONTEND_IMAGE=waardepapieren-clerk-frontend
+DOCKER_VERSION_TAG=4.0
+AZ_RESOURCE_GROUP=Discipl_Wigo4it_DockerGroup4
+AZ_DNSNAMELABEL=discipl
+TARGET_HOST=azure_container_instance
+AZ_TLD=azurecontainer.io
+TIMEZONE=
+CERT_HOST_IP=discipl.westeurope.azurecontainer.io
+CERT_HOST_IP_WP_SERVICE_HOSTNAME=discipl.westeurope.azurecontainer.io
+#######################
+## variables
+#######################
+| 20191231_10_18 | docker-compose-travis.yml|
+| 20191231_10_18 | /Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io |
+<code>
+version: '3'
+services:
+  waardepapieren-service:
+    volumes:
+      #- ./waardepapieren-service/system-test/certs:/certs:rw
+      #- ./waardepapieren-service/system-test/ephemeral-certs:/ephemeral-certs:rw
+      - ./waardepapieren-service/configuration/:/app/configuration2:rw  #FAKE
+    build: waardepapieren-service/.
+    links:
+      - mock-nlx
+    ports:
+      - 3232:3232
+      - 3233:3233
+    environment:
+      - WAARDEPAPIEREN_CONFIG=/app/configuration/waardepapieren-config-compose-travis.json
+      # Ignore self-signed ephemeral cert issues
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+  clerk-frontend:
+    build:
+      context: clerk-frontend/
+      args:
+        - CERTIFICATE_HOST=http://discipl.westeurope.azurecontainer.io:8880
+    links:
+      - waardepapieren-service
+    ports:
+      - 443:443
+      - 8880:8880
+    healthcheck:
+      test: service nginx status
+  #  volumes:
+  #    - ./clerk-frontend/nginx/certs:/etc/nginx/certs:rw
+  mock-nlx:
+    build: mock-nlx/
+    ports:
+      - 80:80
+20191231_10_19 - END JOB :
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
