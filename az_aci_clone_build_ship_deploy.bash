@@ -151,11 +151,15 @@ if  ! [ "$the_world_is_flat" = true ] ; then
     echo 'Be careful not to fall off!'
 fi
 
+# ----------------------------------
+# special Dockerfile commands
+# ---
 #TIMEZONE="ENV TZ=Europe/Amsterdam"
-APT_GET_UPDATE="RUN=apt-get update"
-APT_GET_INSTALL_NET_TOOLS="RUN apt-get install net-tools"
-APT_GET_INSTALL_IPUTILS_PING="RUN apt-get install iputils-ping"
-ENZ=""
+TIMEZONE="halli hallo"
+#APT_GET_UPDATE="RUN apt-get update"
+#APT_GET_INSTALL_NET_TOOLS="RUN apt-get install net-tools"
+#APT_GET_INSTALL_IPUTILS_PING="RUN apt-get install iputils-ping"
+
 
 # ----------------------------------
 # Step 2 : setters
@@ -277,38 +281,6 @@ check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
-# Purpose: set clerk-frontend Dockerfile
-# Arguments: 
-# Return: 
-##################################################################
-set_clerk_frontend_dockerfile_with_volumes() {
-echo "Running: ${FUNCNAME[0]} $@"
-TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
-TT_INSPECT_FILE=Dockerfile 
-enter_touch ${FUNCNAME[0]} $@
-
-echo "FROM node:10
-RUN mkdir /app
-ADD package.json package-lock.json /app/
-ENV REACT_APP_EPHEMERAL_ENDPOINT=https://${CERT_HOST_IP}:443/api/eph
-ENV REACT_APP_EPHEMERAL_WEBSOCKET_ENDPOINT=wss://${CERT_HOST_IP}:443/api/eph-ws
-WORKDIR /app
-RUN npm install --unsafe-perm
-ADD public /app/public
-ADD src /app/src
-ARG CERTIFICATE_HOST
-ENV REACT_APP_CERTIFICATE_HOST=${CERTIFICATE_HOST}
-ENV TZ=Europe/Amsterdam
-RUN npm run build
-
-FROM nginx:1.15.8
-ADD nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --from=0 /app/build /usr/share/nginx/html"  > ${TT_INSPECT_FILE} #Dockerfile
-
-check_check_doublecheck  ${FUNCNAME[0]} $@
-}
-
-##################################################################
 # Purpose: modify mock-nlx.Dockerfile
 # Arguments: 
 # Return: 
@@ -331,6 +303,45 @@ check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
 ##################################################################
+# Purpose: set clerk-frontend Dockerfile
+# Arguments: 
+# Return: 
+##################################################################
+set_clerk_frontend_dockerfile_with_volumes() {
+echo "Running: ${FUNCNAME[0]} $@"
+TT_DIRECTORY=${GITHUB_DIR}/clerk-frontend
+TT_INSPECT_FILE=Dockerfile 
+enter_touch ${FUNCNAME[0]} $@
+
+echo "FROM node:10
+RUN mkdir /app
+ADD package.json package-lock.json /app/
+ENV REACT_APP_EPHEMERAL_ENDPOINT=https://${CERT_HOST_IP}:443/api/eph
+ENV REACT_APP_EPHEMERAL_WEBSOCKET_ENDPOINT=wss://${CERT_HOST_IP}:443/api/eph-ws
+WORKDIR /app
+RUN npm install --unsafe-perm
+ADD public /app/public
+ADD src /app/src
+ARG CERTIFICATE_HOST
+ENV REACT_APP_CERTIFICATE_HOST=${CERTIFICATE_HOST}
+
+$TIMEZONE
+$APT_GET_UPDATE
+$APT_GET_INSTAL
+$APT_GET_INSTALL_IPUTILS_PING
+
+RUN npm run build
+
+FROM nginx:1.15.8
+ADD nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --from=0 /app/build /usr/share/nginx/html"  > ${TT_INSPECT_FILE} #Dockerfile
+
+check_check_doublecheck  ${FUNCNAME[0]} $@
+}
+
+
+
+##################################################################
 # Purpose: modify clerk-frontend.Dockerfile
 # Arguments: 
 # Return: 
@@ -351,7 +362,11 @@ ADD public /app/public
 ADD src /app/src
 ARG CERTIFICATE_HOST
 ENV REACT_APP_CERTIFICATE_HOST=http://${CERT_HOST_IP}:8880
-ENV TZ=Europe/Amsterdam
+$TIMEZONE
+$APT_GET_UPDATE
+$APT_GET_INSTAL
+$APT_GET_INSTALL_IPUTILS_PING
+
 RUN npm run build
 
 FROM nginx:1.15.8
@@ -1455,7 +1470,7 @@ echo "| ${LOG_START_DATE_TIME} | ${GITHUB_DIR}|"                             >> 
 echo "| ${LOG_START_DATE_TIME} | menu.bash |"                                >> ${LOG_FILE}
 echo  "<code>"                                                               >> ${LOG_FILE} 
 cat  ${GITHUB_DIR}/menu.bash                                                 >> ${LOG_FILE}
-#echo "</code>"                                                               >> ${LOG_FILE}
+echo "</code>"                                                               >> ${LOG_FILE}
 
 }
 #######################
@@ -1475,6 +1490,7 @@ create_logdir
 create_directories
 create_logfile_header
 
+echo "<code>"                                                                 >> ${LOG_FILE}
 echo "***  Welcome to  docker build  $BATCH_START_DATE_TIME "                 >> ${LOG_FILE}
 echo "#######################"                                                >> ${LOG_FILE}
 echo "## variables"                                                           >> ${LOG_FILE}
@@ -1502,6 +1518,7 @@ echo "CERT_HOST_IP_WP_SERVICE_HOSTNAME=$CERT_HOST_IP_WP_SERVICE_HOSTNAME"     >>
 echo "#######################"                                                >> ${LOG_FILE}
 echo "## variables"                                                           >> ${LOG_FILE}
 echo "#######################"                                                >> ${LOG_FILE}
+echo "</code>"                                                                >> ${LOG_FILE}
 
 
 ##################################################################
