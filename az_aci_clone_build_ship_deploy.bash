@@ -116,7 +116,7 @@ if [ "$TARGET_HOST" = "azure_container_instance" ]; then
        echo expression evaluated as azure_container_instance
        AZ_TLD=azurecontainer.io
 fi
-pt
+
 # REACT_APP_CERTIFICATE_HOST=https://discipl.westeurope.azurecontainer.io
 # EPHEMERAL_ENDPOINT" : "https://discipl.westeurope.cloudapp.azure.com:3232",
 # EPHEMERAL_WEBSOCKET_ENDPOINT" : "wss://discipl.westeurope.cloudapp.azure.com:3232"
@@ -152,9 +152,9 @@ if  ! [ "$the_world_is_flat" = true ] ; then
 fi
 
 #TIMEZONE="ENV TZ=Europe/Amsterdam"
-APT_GET_UPDATE=RUN apt-get update
-APT_GET_INSTALL_NET_TOOLS=RUN apt-get install net-tools
-APT_GET_INSTALL_IPUTILS_PING=RUN apt-get install iputils-ping
+APT_GET_UPDATE="RUN=apt-get update"
+APT_GET_INSTALL_NET_TOOLS="RUN apt-get install net-tools"
+APT_GET_INSTALL_IPUTILS_PING="RUN apt-get install iputils-ping"
 ENZ=""
 
 # ----------------------------------
@@ -612,13 +612,39 @@ echo " {
 check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
+##################################################################
+# Purpose: set all docker (configuration) files
+# Arguments: 
+# Return: 
+##################################################################
+set_all_dockerfiles() {
+echo "Running: ${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
+TT_PROMPT=$PROMPT
+PROMPT=false
+
+set_docker_compose_travis_yml_without_volumes 
+set_clerk_frontend_dockerfile_without_volumes 
+set_waardepapieren_service_dockerfile_without_volumes 
+set_mock_nlx_dockerfile       
+set_clerk_frontend_nginx_conf 
+set_waardepapieren_service_config_compose_travis_json
+set_waardepapieren_service_config_compose_json
+set_waardepapieren_service_config_json
+set_azure_deploy_aci_yaml
+
+PROMPT=$TT_PROMPT
+create_logfile_footer ${FUNCNAME[0]} $@
+}
+
+
 
 ##################################################################
 # Purpose: hack into azure deploy ACI
 # Arguments: 
 # Return: 
 ##################################################################
-create_azure_deploy_aci_yaml() {
+set_azure_deploy_aci_yaml() {
 echo "Running:${FUNCNAME[0]} $@"
 TT_DIRECTORY=${GITHUB_DIR}
 TT_INSPECT_FILE=deploy-aci.yaml
@@ -683,9 +709,6 @@ check_check_doublecheck  ${FUNCNAME[0]} $@
 # ------------------------------------
 #'# Structured programming:
 #'# Entire program logic modularized in User defined function
-
-
-
 
 the_world_is_flat=true
 # ...do something interesting...
@@ -878,8 +901,7 @@ echo "Running:${FUNCNAME[0]} $@"
  echo "az -v"
  az -v
  
- enter_cont
- 
+ enter_cont 
 }
 
 ##################################################################
@@ -1574,55 +1596,34 @@ show_menus() {
 	echo "~~~~~~~~~~~~~~~~~~~~~"	
 	echo " M A I N - M E N U"
 	echo "~~~~~~~~~~~~~~~~~~~~~"
-    echo "# ----------------------------------"
-    echo "Step 1: prune "
-    echo "# ----------------------------------"
-    echo "#10. Reset (docker system prune-a)"
-    echo "# ----------------------------------"
-    echo "Step 2:   Dockerfile setters"
-    echo "# ----------------------------------"
-    echo "20. set_docker_compose_travis_yml_without_volumes"
-    echo "21. set_clerk_frontend_dockerfile_without_volumes" 
-    echo "22. set_waardepapieren_service_dockerfile_without_volumes"
-    echo "23. set_mock_nlx_dockerfile"    
-    echo "# ----------------------------------"
-    echo "#Step 3 : Networking setters" 
-    echo "# ----------------------------------" 
-    echo "30. set_clerk_frontend_nginx_conf"
-    echo "31. set_waardepapieren_service_config_compose_travis_json"
-    echo "32. set_waardepapieren_service_config_compose_json"
-    echo "33. set_waardepapieren_service_config_json"
-    echo "# ----------------------------------" 
-    echo "#step 4: docker-compose  docker build "
-    echo "# ----------------------------------"
-    echo "40. docker_compose -f docker-compose-travis.yml up $COMPOSE_BUILD_FLAG" 
-    echo "41. docker_build_image $MOCK_NLX_IMAGE"
-    echo "42. docker_build_image $SERVICE_IMAGE "
-    echo "43. docker_build_image $CLERK_FRONTEND_IMAGE "
-    echo "44. docker_tag_images $DOCKER_VERSION_TAG"
-    echo "45. docker_push_images $DOCKER_VERSION_TAG"
-    echo "# ----------------------------------"
-    echo "#step 5: azure  "
-    echo "# ----------------------------------"
-    echo "50. delete_azure_resourcegroup $AZ_RESOURCE_GROUP "
-    echo "51. create_azure_resourcegroup $AZ_RESOURCE_GROUP"
-    echo "52. create_azure_container_group $AZ_RESOURCE_GROUP"
-    echo "53. restart_azure_containergroup $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
-    echo "# ----------------------------------"
-    echo "#step 6 check check triple check  clone build ship deploy "
-    echo "# ----------------------------------" 
-    echo "60. https://github.com/BoschPeter/$GIT_REPO "   
-    echo "61. https://hub.docker.com/?ref=login' boscp08 Peter!...."   #Ship
-  	echo "62. https://portal.azure.com/#home' "
-    echo "63. https://$CERT_HOST_IP:443  " #hope the clerk frontend will be stable "
-    echo "# ----------------------------------"
-  	echo "# step 9  miscelaneous "
-    echo "# ----------------------------------"
-    echo "90. az login -u $AZURE_USER  " 
-    echo "91. docker login -u $DOCKER_USER " 
-    echo "92. the whole sjebang"
-    echo "93. backup scripts"
-    echo "99. Exit"
+  echo "10. docker_system_prune                                     "  
+  echo "20. set_docker_compose_travis_yml_without_volumes           "  
+  echo "21. set_clerk_frontend_dockerfile_without_volumes           "
+  echo "22. set_waardepapieren_service_dockerfile_without_volumes   " 
+  echo "23. set_mock_nlx_dockerfile                                 " 
+  echo "30. set_clerk_frontend_nginx_conf                           "
+  echo "31. set_waardepapieren_service_config_compose_travis_json   "  
+  echo "32. set_waardepapieren_service_config_compose_json          "
+  echo "33. set_waardepapieren_service_config_json                  "   
+  echo "39. set_all_dockerfiles          $CERT_HOST_IP              "                         
+  echo "40. docker_compose_images        $COMPOSE_BUILD_FLAG $MOCK_NLX_IMAGE + $SERVICE_IMAGE + $CLERK_FRONTEND_IMAGE  " 
+  echo "41. docker_build_images          $MOCK_NLX_IMAGE + $SERVICE_IMAGE + $CLERK_FRONTEND_IMAGE"  
+  echo "42. docker_tag_images            $DOCKER_VERSION_TAG        " 
+  echo "42. docker_login                 $DOCKER_USER               " 
+  echo "33. docker_push_images           $DOCKERHUB_MOCK_NLX_IMAGE + $DOCKERHUB_SERVICE_IMAGE + $DOCKERHUB_CLERK_FRONTEND_IMAGE " 
+  echo "34  set_azure_deploy_aci_yaml $AZ_DNSNAMELABEL           "
+  echo "50. azure_login                  $AZURE_USER                "  
+  echo "52. delete_azure_resourcegroup   $AZ_RESOURCE_GROUP         "
+  echo "53. create_azure_resourcegroup   $AZ_RESOURCE_GROUP         " 
+  echo "54. create_azure_containergroup  $AZ_RESOURCE_GROUP         " 
+  echo "59. restart_azure_containergroup $AZ_RESOURCE_GROUP         " 
+  echo "60. bookmark_open https://github.com/BoschPeter/$GIT_REPO   "
+  echo "61. bookmark_open https://hub.docker.com/?ref=login         " 
+  echo "62. bookmark_open https://portal.azure.com/\#home           " 
+  echo "63. bookmark_open https://$CERT_HOST_IP:443                 " 
+	echo "#  sjebang "
+  echo "90 the_whole_sjebang                                        "
+  echo "99. Exit"
 }
 # read input from the keyboard and take a action
 # invoke the one() when the user select 1 from the menu option.
@@ -1641,24 +1642,25 @@ read_options(){
         30) set_clerk_frontend_nginx_conf                           ;;
         31) set_waardepapieren_service_config_compose_travis_json   ;;  
         32) set_waardepapieren_service_config_compose_json          ;;
-        33) set_waardepapieren_service_config_json                  ;;                           
-        40) docker_compose_images                             ;; 
-        41) docker_build_image mock_nlx                             ;;  
-        42) docker_build_image waardepapieren-service               ;; 
-        33) docker_build_image clerk-frontend                       ;; 
-        50) delete_azure_resourcegroup                             ;;
-        51) create_azure_resourcegroup                             ;; 
-        52) create_azure_resourcegroup                             ;; 
-        53) restart_azure_containergroup                           ;; 
+        33) set_waardepapieren_service_config_json                  ;;
+        34) set_azure_deploy_aci_yaml                               ;;
+        39) set_all_dockerfiles                                     ;;                        
+        40) docker_compose_images                                   ;; 
+        41) docker_build_images                                     ;;  
+        42) docker_tag_images                                       ;; 
+        42) docker_login                                            ;; 
+        33) docker_push_images                                      ;; 
+        50) azure_login                                             ;; 
+        50) delete_azure_resourcegroup                              ;;
+        51) create_azure_resourcegroup                              ;; 
+        53) create_azure_containergroup                             ;; 
+        53) restart_azure_containergroup                            ;; 
         60) bookmark_open https://github.com/BoschPeter/$GIT_REPO   ;;
         61) bookmark_open https://hub.docker.com/?ref=login         ;; 
         62) bookmark_open https://portal.azure.com/\#home           ;; 
         63) bookmark_open https://$CERT_HOST_IP:443                 ;; 
         #64) bookmark_open https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/${AZ_RESOURCE_GROUP}/providers/Microsoft.ContainerInstance/containerGroups/$AZ_RESOURCE_GROUP/containers'  ;;
-        90) azure_login                                             ;; 
-        91) docker_login                                            ;; 
-        92) the_whole_sjebang                                       ;; 
-        93) write_az_clone_build_ship_deploy_bash                   ;; 
+        90) the_whole_sjebang                                       ;; 
         99) Exit                                                    ;;
 		*) echo -e "${RED}Error...${STD}" && sleep 1
 	esac
