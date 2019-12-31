@@ -116,13 +116,11 @@ if [ "$TARGET_HOST" = "azure_container_instance" ]; then
        echo expression evaluated as azure_container_instance
        AZ_TLD=azurecontainer.io
 fi
-
+pt
 # REACT_APP_CERTIFICATE_HOST=https://discipl.westeurope.azurecontainer.io
 # EPHEMERAL_ENDPOINT" : "https://discipl.westeurope.cloudapp.azure.com:3232",
 # EPHEMERAL_WEBSOCKET_ENDPOINT" : "wss://discipl.westeurope.cloudapp.azure.com:3232"
 
-#TIMEZONE="ENV TZ=Europe/Amsterdam"
-TIMEZONE=""
 
 #EPHEMERAL_RETENTION_TIME=86400  #24h 
 EPHEMERAL_RETENTION_TIME=2592001 #30 dagen
@@ -152,6 +150,11 @@ the_world_is_flat=true
 if  ! [ "$the_world_is_flat" = true ] ; then
     echo 'Be careful not to fall off!'
 fi
+
+#TIMEZONE="ENV TZ=Europe/Amsterdam"
+APT_GET_UPDATE=RUN apt-get update
+APT_GET_INSTALL_NET_TOOLS=RUN apt-get install net-tools
+APT_GET_INSTALL_IPUTILS_PING=RUN apt-get install iputils-ping
 
 
 # ----------------------------------
