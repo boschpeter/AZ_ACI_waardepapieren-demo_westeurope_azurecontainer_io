@@ -1604,23 +1604,24 @@ show_menus() {
   echo "30. set_clerk_frontend_nginx_conf                           "
   echo "31. set_waardepapieren_service_config_compose_travis_json   "  
   echo "32. set_waardepapieren_service_config_compose_json          "
-  echo "33. set_waardepapieren_service_config_json                  "   
+  echo "33. set_waardepapieren_service_config_json                  "  
+  echo "34  set_azure_deploy_aci_yaml    $AZ_DNSNAMELABEL           " 
   echo "39. set_all_dockerfiles          $CERT_HOST_IP              "                         
   echo "40. docker_compose_images        $COMPOSE_BUILD_FLAG $MOCK_NLX_IMAGE + $SERVICE_IMAGE + $CLERK_FRONTEND_IMAGE  " 
   echo "41. docker_build_images          $MOCK_NLX_IMAGE + $SERVICE_IMAGE + $CLERK_FRONTEND_IMAGE"  
   echo "42. docker_tag_images            $DOCKER_VERSION_TAG        " 
-  echo "42. docker_login                 $DOCKER_USER               " 
-  echo "33. docker_push_images           $DOCKERHUB_MOCK_NLX_IMAGE + $DOCKERHUB_SERVICE_IMAGE + $DOCKERHUB_CLERK_FRONTEND_IMAGE " 
-  echo "34  set_azure_deploy_aci_yaml $AZ_DNSNAMELABEL           "
+  echo "43. docker_login                 $DOCKER_USER               " 
+  echo "44. docker_push_images           $DOCKERHUB_MOCK_NLX_IMAGE + $DOCKERHUB_SERVICE_IMAGE + $DOCKERHUB_CLERK_FRONTEND_IMAGE " 
   echo "50. azure_login                  $AZURE_USER                "  
   echo "52. delete_azure_resourcegroup   $AZ_RESOURCE_GROUP         "
   echo "53. create_azure_resourcegroup   $AZ_RESOURCE_GROUP         " 
   echo "54. create_azure_containergroup  $AZ_RESOURCE_GROUP         " 
   echo "59. restart_azure_containergroup $AZ_RESOURCE_GROUP         " 
-  echo "60. bookmark_open https://github.com/BoschPeter/$GIT_REPO   "
-  echo "61. bookmark_open https://hub.docker.com/?ref=login         " 
-  echo "62. bookmark_open https://portal.azure.com/\#home           " 
-  echo "63. bookmark_open https://$CERT_HOST_IP:443                 " 
+  echo "60. https://github.com/BoschPeter/$GIT_REPO   "
+  echo "61. https://hub.docker.com/?ref=login         " 
+  echo "62. https://portal.azure.com/\#home           " 
+  echo "63. https://$CERT_HOST_IP:443                 " 
+  echo "64. pim https://waardepapieren-demo.discipl.org BSN=663678651" 
 	echo "#  sjebang "
   echo "90 the_whole_sjebang                                        "
   echo "99. Exit"
@@ -1648,8 +1649,8 @@ read_options(){
         40) docker_compose_images                                   ;; 
         41) docker_build_images                                     ;;  
         42) docker_tag_images                                       ;; 
-        42) docker_login                                            ;; 
-        33) docker_push_images                                      ;; 
+        43) docker_login                                            ;; 
+        44) docker_push_images                                      ;; 
         50) azure_login                                             ;; 
         50) delete_azure_resourcegroup                              ;;
         51) create_azure_resourcegroup                              ;; 
@@ -1659,6 +1660,7 @@ read_options(){
         61) bookmark_open https://hub.docker.com/?ref=login         ;; 
         62) bookmark_open https://portal.azure.com/\#home           ;; 
         63) bookmark_open https://$CERT_HOST_IP:443                 ;; 
+        64) bookmark_open https://waardepapieren-demo.discipl.org   ;;
         #64) bookmark_open https://portal.azure.com/#@boschpeteroutlook.onmicrosoft.com/resource/subscriptions/cfcb03ea-255b-42f8-beca-2d4ac30779bb/resourceGroups/${AZ_RESOURCE_GROUP}/providers/Microsoft.ContainerInstance/containerGroups/$AZ_RESOURCE_GROUP/containers'  ;;
         90) the_whole_sjebang                                       ;; 
         99) Exit                                                    ;;
