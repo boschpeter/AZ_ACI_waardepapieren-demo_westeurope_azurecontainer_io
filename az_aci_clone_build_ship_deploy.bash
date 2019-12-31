@@ -155,7 +155,7 @@ fi
 APT_GET_UPDATE=RUN apt-get update
 APT_GET_INSTALL_NET_TOOLS=RUN apt-get install net-tools
 APT_GET_INSTALL_IPUTILS_PING=RUN apt-get install iputils-ping
-
+ENZ=""
 
 # ----------------------------------
 # Step 2 : setters
