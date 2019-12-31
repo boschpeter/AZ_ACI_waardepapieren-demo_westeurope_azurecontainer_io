@@ -500,9 +500,6 @@ CMD npm start"  > ${TT_INSPECT_FILE}
 check_check_doublecheck  ${FUNCNAME[0]} $@
 }
 
-#----------------------------------------------
-#--------------------------------------------
-
 
 #################################################################
 # Purpose: hack 
@@ -687,6 +684,9 @@ check_check_doublecheck  ${FUNCNAME[0]} $@
 #'# Structured programming:
 #'# Entire program logic modularized in User defined function
 
+
+
+
 the_world_is_flat=true
 # ...do something interesting...
 if ! [ "$the_world_is_flat" = true ] ; then
@@ -840,7 +840,6 @@ echo "========="
 enter_cont
 
 cd $GITHUB_DIR
-
 
 fi
 
@@ -1045,10 +1044,15 @@ docker container prune -a
 # Arguments: docker-compose -f docker-compose-travis.yml up   (docker-compose=thirdparty tool)
 # Return: 3 containers  
 ##################################################################
-docker_compose_min_f_docker-travis_compose_yml_up() {
+docker_compose_images() {
 echo "Running:${FUNCNAME[0]} $@"
-cd ${DOCKER_COMPOSE_DIR}
+cd ${GITHUB_DIR}
+create_logfile_header ${FUNCNAME[0]} $@
+echo "docker-compose -f docker-compose-travis.yml up $COMPOSE_BUILD_FLAG"     >> ${LOG_FILE}
+
 docker-compose -f docker-compose-travis.yml up $COMPOSE_BUILD_FLAG
+
+create_logfile_footer
 
 }
 #################################################################
@@ -1093,7 +1097,7 @@ docker tag $1/$2:latest $1/$3:$4
 # Arguments: docker build -t boscp08/waardepapieren-service .   NB [.] periode means from this directory 
 # Return: 
 ##################################################################
-docker_build_waardepapieren_service()  {
+docker_build_waardepapierenservice()  {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 cd ${GITHUB_DIR}/waardepapieren-service
@@ -1105,7 +1109,7 @@ docker build -t ${DOCKER_USER}/waardepapieren-service .  #NB [.] periode means f
 # Arguments: docker build -t boscp08/     NB . periode means from this directory 
 # Return: 
 ##################################################################
-docker_build_clerk_frontend() {
+docker_build_clerkfrontend() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 cd ${GITHUB_DIR}/clerk-frontend
@@ -1117,7 +1121,7 @@ docker build -t ${DOCKER_USER}/clerk-frontend .  #NB [.] periode means from this
 # Arguments: docker build -t boscp08/waardepapieren_mock-nlx     NB . periode means from this directory 
 # Return: 
 ##################################################################
-docker_build_waardepapieren() {
+docker_build_images() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 docker_build_image mock-nlx  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
@@ -1130,14 +1134,13 @@ docker_build_image clerk-frontend ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKE
 # Arguments: docker tag -t boscp08/waardepapieren_clerk-frontend    
 # Return: 
 ##################################################################
-docker_tag_waardepapieren() {
+docker_tag_images() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 docker_tag_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_tag_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_tag_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
 docker images | grep  ${DOCKER_VERSION_TAG}   
-enter_cont
 }
 
 ##################################################################
@@ -1145,13 +1148,14 @@ enter_cont
 # Arguments: docker push -t boscp08/waardepapieren_service   
 # Return: Ship to docker registry docker.hub.com
 ##################################################################
-docker_push_waardepapieren() {
+docker_push_images() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 docker_push_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_push_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 docker_push_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG} 
 create_logfile_footer
+
 }
 
 ##################################################################
@@ -1159,7 +1163,7 @@ create_logfile_footer
 # Arguments: docker push -t boscp08/waardepapieren_service   
 # Return: Ship to docker registry docker.hub.com
 ##################################################################
-docker_commit_waardepapieren() {
+docker_commit_containers() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 docker commit ${MOCK_NLX_IMAGE} ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}  
@@ -1177,7 +1181,7 @@ create_logfile_footer
 # Arguments: 
 # Return: 
 ##################################################################
-create_azure_resource_group() {
+create_azure_resourcegroup() {
 echo "-- Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
@@ -1191,7 +1195,7 @@ enter_cont
 # Arguments: 
 # Return: 
 ##################################################################
-delete_azure_resource_group() {
+delete_azure_resourcegroup() {
 echo "-- Running:${FUNCNAME[0]} $@ "
 create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
@@ -1234,11 +1238,11 @@ az container show --resource-group $1--name $2 --output table
 # Arguments: 
 # Return: CI CD 
 ##################################################################
-restart_azure_container_group() {
-echo "Running: create_azure_container_group" 
+restart_azure_containergroup() {
+echo "-- Running:${FUNCNAME[0]} $@"  
 cd ${PROJECT_DIR}
-#az container restart --resource-group ${AZ_RESOURCE_GROUP}
-az container restart --resource-group $1
+az container restart --resource-group ${AZ_RESOURCE_GROUP}
+#az container restart --resource-group $1
 }
 
 ##################################################################
@@ -1270,11 +1274,11 @@ docker_push_image  ${DOCKER_USER} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TA
 docker_push_image  ${DOCKER_USER} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
 
 az login -u $AZURE_USER -p $AZURE_PWD  # temporarilyß
-delete_azure_resource_group  $AZ_RESOURCE_GROUP
-create_azure_resource_group  $AZ_RESOURCE_GROUP
+delete_azure_resourcegroup  $AZ_RESOURCE_GROUP
+create_azure_resourcegroup  $AZ_RESOURCE_GROUP
 create_azure_container_group $AZ_RESOURCE_GROUP
 create_logfile_footer
-#   14) restart_azure_container_group ;;
+#   14) restart_azure_containergroup ;;
 }
 
 
@@ -1297,6 +1301,118 @@ if  [ `uname` = 'Darwin' ]
     then  open -a Firefox $1
    #echo "MacOs"
 fi
+}
+
+
+##################################################################
+# Purpose: azure_login
+# Arguments: 
+# Return: variables
+##################################################################
+azure_login() {
+
+az login -u bosch.peter@outlook.com -p 0lifanten 
+
+# //////////////////////////////////////////////////////////////////////////////////////////
+#  az account list
+#[
+#  {
+#    "cloudName": "AzureCloud",
+#    "id": "cfcb03ea-255b-42f8-beca-2d4ac30779bb",
+#    "isDefault": true,
+#    "name": "Azure-abonnement 1",
+#    "state": "Enabled",
+#    "tenantId": "62123322-502d-493f-b543-503672043240",
+#    "user": {
+#      "name": "bosch.peter@outlook.com", 0l..ten
+#      "type": "user"
+#    }
+#  }
+#]
+
+
+#If you’re in a hurry, here is a brief summary of somecommands used in this post:
+
+## List currently authenticated subscriptions
+#az account list
+
+## Log in to a subscription
+#az login
+
+## Display subscriptions by Name and show which is selected
+#az account list --query "[].{Name:name, IsDefault:isDefault}"
+
+## Select a specific subscription by name
+#az account set --subscription "Visual Studio Enterprise"
+
+## Show usernames associated with specific subscriptions
+#az account list --query "[].{Name:name, User:user.name}"
+
+## Show usernames associated with a specific subscriptio matching Name
+#az account list --query "[?contains(name, 'Visual')].{Name:name, User:user.name}"
+
+## Log out of a specific subscription by username
+#az logout --username "user@example.com"
+
+## List virtual machines for select account
+#az vm list
+
+
+#https://docs.microsoft.com/en-us/azure/virtual-machines/azure-cli-arm-commands
+#https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest
+
+}
+
+##################################################################
+# Purpose: docker_login
+# Arguments: 
+# Return: variables
+##################################################################
+docker_login () {
+docker login -u $DOCKER_USER  -p $DOCKER_PWD 
+# docker container 
+#  attach      Attach local standard input, output, and error streams to a running container
+#  commit      Create a new image from a container's changes
+#  cp          Copy files/folders between a container and the local filesystem
+#  create      Create a new container
+#  diff        Inspect changes to files or directories on a container's filesystem
+#  exec        Run a command in a running container
+#  export      Export a container's filesystem as a tar archive
+#  inspect     Display detailed information on one or more containers
+#  kill        Kill one or more running containers
+#  logs        Fetch the logs of a container
+#  ls          List containers
+#  pause       Pause all processes within one or more containers
+#  port        List port mappings or a specific mapping for the container
+#  prune       Remove all stopped containers
+#  rename      Rename a container
+#  restart     Restart one or more containers
+#  rm          Remove one or more containers
+#  run         Run a command in a new container
+#  start       Start one or more stopped containers
+#  stats       Display a live stream of container(s) resource usage statistics
+#  stop        Stop one or more running containers
+#  top         Display the running processes of a container
+#  unpause     Unpause all processes within one or more containers
+#  update      Update configuration of one or more containers
+#  wait        Block until one or more containers stop, then print their exit codes
+
+#Usage:	docker image COMMAND
+#Manage images
+
+#Commands:
+#  build       Build an image from a Dockerfile
+#  history     Show the history of an image
+#  import      Import the contents from a tarball to create a filesystem image
+#  inspect     Display detailed information on one or more images
+#  load        Load an image from a tar archive or STDIN
+#  ls          List images
+#  prune       Remove unused images
+#  pull        Pull an image or a repository from a registry
+#  push        Push an image or a repository to a registry
+#  rm          Remove one or more images
+#  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAG
+#  save        Save one or more images to a tar archive (streamed to STDOUT by default)\
 }
 
 ##################################################################
@@ -1324,9 +1440,9 @@ cat  ${GITHUB_DIR}/menu.bash                                                 >> 
 ## M A I N
 # program starts here actually
 #######################
-
+BATCH_START_DATE_TIME=`date +%Y%m%d_%H_%M`
 echo "***"   
-echo "***  Welcome to  docker build   "
+echo "***  Welcome to  docker build  $BATCH_START_DATE_TIME "
 echo "***"   
 echo "*** You are about to start to build new waardepapieren images and containers "
 echo "***  FQDN = https://${CERT_HOST_IP} "
@@ -1336,6 +1452,8 @@ echo "***"
 create_logdir
 create_directories
 create_logfile_header
+
+echo "***  Welcome to  docker build  $BATCH_START_DATE_TIME "                 >> ${LOG_FILE}
 echo "#######################"                                                >> ${LOG_FILE}
 echo "## variables"                                                           >> ${LOG_FILE}
 echo "#######################"                                                >> ${LOG_FILE}
@@ -1486,10 +1604,10 @@ show_menus() {
     echo "# ----------------------------------"
     echo "#step 5: azure  "
     echo "# ----------------------------------"
-    echo "50. delete_azure_resource_group $AZ_RESOURCE_GROUP "
-    echo "51. create_azure_resource_group $AZ_RESOURCE_GROUP"
+    echo "50. delete_azure_resourcegroup $AZ_RESOURCE_GROUP "
+    echo "51. create_azure_resourcegroup $AZ_RESOURCE_GROUP"
     echo "52. create_azure_container_group $AZ_RESOURCE_GROUP"
-    echo "53. restart_azure_container_group $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
+    echo "53. restart_azure_containergroup $AZ_RESOURCE_GROUP  a.ka. (re) pull docker hub"
     echo "# ----------------------------------"
     echo "#step 6 check check triple check  clone build ship deploy "
     echo "# ----------------------------------" 
@@ -1524,14 +1642,14 @@ read_options(){
         31) set_waardepapieren_service_config_compose_travis_json   ;;  
         32) set_waardepapieren_service_config_compose_json          ;;
         33) set_waardepapieren_service_config_json                  ;;                           
-        40) docker_compose_min_f_docker                             ;; 
+        40) docker_compose_images                             ;; 
         41) docker_build_image mock_nlx                             ;;  
         42) docker_build_image waardepapieren-service               ;; 
         33) docker_build_image clerk-frontend                       ;; 
-        50) delete_azure_resource_group                             ;;
-        51) create_azure_resource_group                             ;; 
-        52) create_azure_resource_group                             ;; 
-        53) restart_azure_container_group                           ;; 
+        50) delete_azure_resourcegroup                             ;;
+        51) create_azure_resourcegroup                             ;; 
+        52) create_azure_resourcegroup                             ;; 
+        53) restart_azure_containergroup                           ;; 
         60) bookmark_open https://github.com/BoschPeter/$GIT_REPO   ;;
         61) bookmark_open https://hub.docker.com/?ref=login         ;; 
         62) bookmark_open https://portal.azure.com/\#home           ;; 
@@ -1562,6 +1680,20 @@ done
 
 fi
 
+
+
+
+
+echo 
+echo "hope the run will be ok!"
+echo      
+
+echo                             >> ${LOG_LEVEL}
+echo "hope the run will be ok!"  >> ${LOG_FILE}
+echo                             >> ${LOG_FILE}
+BATCH_END_DATE_TIME=`date +%Y%m%d_%H_%M`
+echo "$BATCH_START_DATE_TIME  - $BATCH_END_DATE_TIME "  >>${LOG_DIR}                    
+
 ##################################################################
 # Purpose: write code
 # Arguments: 
@@ -1574,144 +1706,18 @@ clear
 while true; do
     read -p "write code  in the log (y or n)?" yn
     case $yn in
-          [Yy]* ) WRITE_CODE=true ; break;;
+          [Yy]* ) write_az_clone_build_ship_deploy_bash ; break;;
           [Nn]* ) WRITE_CODE=false ;  break;;
         * ) echo "Please answer yes or no.";;
     esac
 done
 fi
 
-if [ ${WRITE_CODE} = true ] 
- then 
- cd ${GITHUB_DIR}
- write_az_clone_build_ship_deploy_bash
- cat ${LOG_FILE} | more
-echo "" 
-echo "" 
-clear
-fi
-
-create_logfile_footer
-echo
-echo "hope the run will be ok!"
-echo
-
 echo " cd back into " ${GITHUB_DIR}
 cd ${GITHUB_DIR}
+echo "$BATCH_START_DATE_TIME  - $BATCH_END_DATE_TIME "
+sleep 2
 clear
-
 
 # eof
 
-
-##################################################################
-# Purpose: azure_login
-# Arguments: 
-# Return: variables
-##################################################################
-azure_login() {
-
-az login -u bosch.peter@outlook.com -p 0lifanten 
-
-# //////////////////////////////////////////////////////////////////////////////////////////
-#  az account list
-#[
-#  {
-#    "cloudName": "AzureCloud",
-#    "id": "cfcb03ea-255b-42f8-beca-2d4ac30779bb",
-#    "isDefault": true,
-#    "name": "Azure-abonnement 1",
-#    "state": "Enabled",
-#    "tenantId": "62123322-502d-493f-b543-503672043240",
-#    "user": {
-#      "name": "bosch.peter@outlook.com", 0l..ten
-#      "type": "user"
-#    }
-#  }
-#]
-
-
-#If you’re in a hurry, here is a brief summary of somecommands used in this post:
-
-## List currently authenticated subscriptions
-#az account list
-
-## Log in to a subscription
-#az login
-
-## Display subscriptions by Name and show which is selected
-#az account list --query "[].{Name:name, IsDefault:isDefault}"
-
-## Select a specific subscription by name
-#az account set --subscription "Visual Studio Enterprise"
-
-## Show usernames associated with specific subscriptions
-#az account list --query "[].{Name:name, User:user.name}"
-
-## Show usernames associated with a specific subscriptio matching Name
-#az account list --query "[?contains(name, 'Visual')].{Name:name, User:user.name}"
-
-## Log out of a specific subscription by username
-#az logout --username "user@example.com"
-
-## List virtual machines for select account
-#az vm list
-
-
-#https://docs.microsoft.com/en-us/azure/virtual-machines/azure-cli-arm-commands
-#https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest
-
-}
-
-
-##################################################################
-# Purpose: docker_login
-# Arguments: 
-# Return: variables
-##################################################################
-docker_login () {
-docker login -u $DOCKER_USER  -p $DOCKER_PWD 
-# docker container 
-#  attach      Attach local standard input, output, and error streams to a running container
-#  commit      Create a new image from a container's changes
-#  cp          Copy files/folders between a container and the local filesystem
-#  create      Create a new container
-#  diff        Inspect changes to files or directories on a container's filesystem
-#  exec        Run a command in a running container
-#  export      Export a container's filesystem as a tar archive
-#  inspect     Display detailed information on one or more containers
-#  kill        Kill one or more running containers
-#  logs        Fetch the logs of a container
-#  ls          List containers
-#  pause       Pause all processes within one or more containers
-#  port        List port mappings or a specific mapping for the container
-#  prune       Remove all stopped containers
-#  rename      Rename a container
-#  restart     Restart one or more containers
-#  rm          Remove one or more containers
-#  run         Run a command in a new container
-#  start       Start one or more stopped containers
-#  stats       Display a live stream of container(s) resource usage statistics
-#  stop        Stop one or more running containers
-#  top         Display the running processes of a container
-#  unpause     Unpause all processes within one or more containers
-#  update      Update configuration of one or more containers
-#  wait        Block until one or more containers stop, then print their exit codes
-
-#Usage:	docker image COMMAND
-#Manage images
-
-#Commands:
-#  build       Build an image from a Dockerfile
-#  history     Show the history of an image
-#  import      Import the contents from a tarball to create a filesystem image
-#  inspect     Display detailed information on one or more images
-#  load        Load an image from a tar archive or STDIN
-#  ls          List images
-#  prune       Remove unused images
-#  pull        Pull an image or a repository from a registry
-#  push        Push an image or a repository to a registry
-#  rm          Remove one or more images
-#  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAG
-#  save        Save one or more images to a tar archive (streamed to STDOUT by default)\
-}
