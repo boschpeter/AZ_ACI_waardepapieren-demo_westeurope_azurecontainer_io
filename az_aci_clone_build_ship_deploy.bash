@@ -78,26 +78,30 @@ if  [ `uname` = 'MING64_NT-10.0-18362' ]
    echo "Windows10  ... "
 fi
 
-#tt
+
 GIT_PWD=Peter\!2020
 DOCKER_PWD=Peter\!2020
 AZURE_PWD=0lifanten
 
 PROJECT_DIR=$HOME_DIR/Projects/scratch/virtual-insanity    
 GIT_USER=BoschPeter
-GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io  #see befores
+#GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io  #see befores
+GIT_REPO=waardepapieren  #see befores
 GITHUB_DIR=$PROJECT_DIR/${GIT_REPO}   
 DOCKER_USER="boscp08"  #NB repository name must be lowercase  Peter!2020
 COMPOSE_BUILD_FLAG=" --build"
 # You build a docker on your laptop and then you are the same as in production. That is why you should use containers btw docker is not fast
 # Naming your containers
 
-MOCK_NLX_IMAGE=waardepapieren_mock-nlx
-SERVICE_IMAGE=waardepapieren_waardepapieren-service
-CLERK_FRONTEND_IMAGE=waardepapieren_clerk-frontend
-DOCKERHUB_MOCK_NLX_IMAGE=waardepapieren-mock-nlx
-DOCKERHUB_SERVICE_IMAGE=waardepapieren-waardepapieren-service
-DOCKERHUB_CLERK_FRONTEND_IMAGE=waardepapieren-clerk-frontend
+MOCK-NLX="mock-nlx"
+SERVICE="waardepapieren-service"
+CLERK_FRONTEND="clerk-frontend"
+MOCK_NLX_IMAGE=${GIT_REPO}_mock-nlx
+SERVICE_IMAGE=${GIT_REPO}_waardepapieren-service
+CLERK_FRONTEND_IMAGE=${GIT_REPO}_clerk-frontend
+DOCKERHUB_MOCK_NLX_IMAGE=${GIT_REPO}-mock-nlx
+DOCKERHUB_SERVICE_IMAGE=${GIT_REPO}-waardepapieren-service
+DOCKERHUB_CLERK_FRONTEND_IMAGE=${GIT_REPO}-clerk-frontend
 #with 
 DOCKER_VERSION_TAG="4.0"
 # Application is the same everywhere on the DTAP street. DTAP is the most important. Pets & Cattle!
@@ -152,7 +156,7 @@ if  ! [ "$the_world_is_flat" = true ] ; then
 fi
 
 # ----------------------------------
-# special Dockerfile commands
+# specify own modifications in Dockerfile
 # ---------------------------
 #TIMEZONE="ENV TZ=Europe/Amsterdam"
 #APT_GET_UPDATE="RUN apt-get update"
@@ -645,6 +649,18 @@ create_logfile_header ${FUNCNAME[0]} $@
 TT_PROMPT=$PROMPT
 PROMPT=false
 
+echo "set_docker_compose_travis_yml_without_volumes" 
+echo "set_clerk_frontend_dockerfile_without_volumes" 
+echo "set_waardepapieren_service_dockerfile_without_volumes" 
+echo "set_mock_nlx_dockerfile"       
+echo "set_clerk_frontend_nginx_conf" 
+echo "set_waardepapieren_service_config_compose_travis_json"
+echo "set_waardepapieren_service_config_compose_json"
+echo "set_waardepapieren_service_config_json"
+echo "set_azure_deploy_aci_yaml"
+echo "okay ?"
+echo enter
+
 set_docker_compose_travis_yml_without_volumes 
 set_clerk_frontend_dockerfile_without_volumes 
 set_waardepapieren_service_dockerfile_without_volumes 
@@ -657,6 +673,85 @@ set_azure_deploy_aci_yaml
 
 PROMPT=$TT_PROMPT
 create_logfile_footer ${FUNCNAME[0]} $@
+}
+
+
+##################################################################
+# Purpose: shortcuts
+# Arguments: 
+# Return: 
+##################################################################
+tt() {
+
+if [ "$1" = "" ] 
+ then echo "geen input gespecificeerd" 
+  echo "sad=set_all_dockerfiles"
+  echo "dci=docker_compose_images"
+  echo "dti=docker_tag_images"
+  echo "dpi=docker_push_images"
+  echo "adr=azure_delete_resourcegroups"
+  echo "acr=azure_create_resourcegroups"
+  echo "acc=azure_create_containergroup"
+  echo "arc=azure_restart_containergroup pull again"
+  enter_cont
+  
+fi 
+
+if [ "$1" = "sad" ] 
+ then 
+echo "set_all_dockerfiles" 
+fi
+
+if [ "$1" = "sad" ] 
+ then 
+echo "sad=set_all_dockerfiles"
+enter_cont
+set_all_dockerfiles
+ fi
+  
+  if [ "$1" = "dci" ] 
+ then 
+  echo "dci=docker_compose_images"
+  enter_cont
+  docker_compose_images
+  fi
+  
+  if [ "$1" = "dti" ] 
+ then  echo "dti=docker_tag_images"
+ enter_cont
+ docker_tag_images
+   fi
+
+    if [ "$1" = "dpi" ] 
+    then  echo "dpi=docker_push_images"
+    enter_cont
+    docker_push_images
+  fi
+  
+  if [ "$1" = "adr" ] 
+    then echo "adr=azure_delete_resourcegroup"
+    enter_cont
+    azure_delete_resourcegroup
+  fi
+
+  if [ "$1" = "acr" ] 
+   then echo "acr=azure_create_resourcegroup"
+   enter_cont
+   azure_create_resourcegroup
+  fi
+  
+  if [ "$1" = "acc" ] 
+   then echo "acc=azure_create_containergroup"
+   enter_cont
+   azure_create_containergroup
+  fi
+
+  if [ "$1" = "arc" ] 
+   then  echo "arc=azure_restart_containergroup pull again"
+   enter_cont
+   azure_restart_containergroup
+  fi
+
 }
 
 
@@ -676,7 +771,7 @@ echo "location: westeurope
 name: $AZ_RESOURCE_GROUP
 properties:
   containers:
-  - name: ${MOCK_NLX_IMAGE}
+  - name: mock-nlx
     properties:
       image: ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}
       resources:
@@ -685,7 +780,7 @@ properties:
           memoryInGb: 0.5
       ports:
       - port: 80
-  - name: ${SERVICE_IMAGE}
+  - name: waardepapieren-service
     properties:
       image: ${DOCKER_USER}/${DOCKERHUB_SERVICE_IMAGE}:${DOCKER_VERSION_TAG}
       resources:
@@ -695,7 +790,7 @@ properties:
       ports:
       - port: 3232
       - port: 3233
-  - name: ${CLERK_FRONTEND_IMAGE}
+  - name: clerk-frontend
     properties:
       image: ${DOCKER_USER}/${DOCKERHUB_CLERK_FRONTEND_IMAGE}:${DOCKER_VERSION_TAG}
       resources:
@@ -705,7 +800,7 @@ properties:
       ports:
       - port: 443
       - port: 8880
-  osType: Linux
+  osType: Linu
   ipAddress:
     type: Public
     # fqdn wordt: discipl_waardepapieren.westeurope.azurecontainer.io
@@ -992,7 +1087,6 @@ git config --global user.password "Peter\!2020"
 # git config --global user.name "ezahr"
 #git clone https://github.com/ezahr/Waardepapieren-AZURE-ACI.git
 #cd into 
-
 }
 
 #################################################
@@ -1015,7 +1109,6 @@ git config --list
 git config --get remote.origin.Uittreksel
 git config credential.username --global "Ezahr"
 git config credential.password --global "Peter\!2020"
-
 }
 
 ##################################################################
@@ -1058,7 +1151,7 @@ docker system prune -a
 # Arguments: 
 # Return: 
 ##################################################################
-docker_containers_stop() {
+docker_stop() {
 echo "-Running:${FUNCNAME[0]} $@"
 docker stop  $(docker ps -a -q)
 }
@@ -1068,7 +1161,7 @@ docker stop  $(docker ps -a -q)
 # Arguments: 
 # Return:   
 ##################################################################
-docker_images_remove() {
+docker_remove_images() {
 echo "Running:${FUNCNAME[0]} $@"
 echo "docker rm $(docker ps -a -q) && docker rmi $(docker images -q)"   >> ${LOG_DIR}
 
@@ -1128,32 +1221,6 @@ docker build -t $2/$3 .  #mind the dot!
 cd ${GITHUB_DIR}  #cd -
 }
 
-
-##################################################################
-# Purpose:  Build an image from a Dockerfile
-# Arguments: docker build -t boscp08/waardepapieren-service .   NB [.] periode means from this directory 
-# Return: 
-##################################################################
-docker_build_waardepapierenservice()  {
-echo "Running:${FUNCNAME[0]} $@"
-create_logfile_header ${FUNCNAME[0]} $@
-cd ${GITHUB_DIR}/waardepapieren-service
-docker build -t ${DOCKER_USER}/waardepapieren-service .  #NB [.] periode means from this directory 
-}
-
-##################################################################
-# Purpose:  Procedure to build the waardepapieren images and run containers.  
-# Arguments: docker build -t boscp08/     NB . periode means from this directory 
-# Return: 
-##################################################################
-docker_build_clerkfrontend() {
-echo "Running:${FUNCNAME[0]} $@"
-create_logfile_header ${FUNCNAME[0]} $@
-cd ${GITHUB_DIR}/clerk-frontend
-docker build -t ${DOCKER_USER}/clerk-frontend .  #NB [.] periode means from this directory 
-create_logfile_footer ${FUNCNAME[0]} $@
-}
-
 ##################################################################
 # Purpose:  Procedure to build the waardepapieren images and run containers.  
 # Arguments: docker build -t boscp08/waardepapieren_mock-nlx     NB . periode means from this directory 
@@ -1169,6 +1236,45 @@ create_logfile_footer ${FUNCNAME[0]} $@
 }
 
 
+##################################################################
+# Purpose:  Build an image from a Dockerfile
+# Arguments: docker build -t boscp08/waardepapieren-service .   NB [.] periode means from this directory 
+# Return: 
+##################################################################
+docker_build_waardepapierenservice()  {
+echo "Running:${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
+cd ${GITHUB_DIR}/waardepapieren-service
+docker build -t ${DOCKER_USER}/waardepapieren-service .  #NB [.] periode means from this directory 
+}
+
+##################################################################
+# Purpose:  build custom image s  
+# Arguments: specify own modifications in Dockerfile
+# Return: 
+##################################################################
+docker_build_clerkfrontend() {
+echo "Running:${FUNCNAME[0]} $@"
+create_logfile_header ${FUNCNAME[0]} $@
+cd ${GITHUB_DIR}/clerk-frontend
+docker build -t ${DOCKER_USER}/clerk-frontend .  #NB [.] directory containing Dockerfile and other files needed in image
+create_logfile_footer ${FUNCNAME[0]} $@
+}
+
+
+##################################################################
+# Purpose:  start container from base image
+# Arguments: docker run [image] [ps -f]
+# Return: 
+##################################################################
+docker_run_image() {
+echo "Running:${FUNCNAME[0]} $@"
+#-p 8080:80
+#-d detatched 
+create_logfile_header ${FUNCNAME[0]} $@
+docker run -it $1 bash
+create_logfile_footer ${FUNCNAME[0]} $@
+}
 #################################################################
 # Purpose:  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
 # Arguments: docker_tag boscp08  waardepapieren_mock-nlx 4.0 
@@ -1183,7 +1289,7 @@ arg1=$1 #${DOCKER_USER}
 arg2=$2 #${MOCK_NLX_IMAGE}
 arg3=$3 #${DOCKERHUB_MOCK_NLX_IMAGE}
 arg4=$4 #${DOCKER_VERSION_TAG}
-docker tag $1/$2:latest $1/$3:$4
+docker tag $2:latest $1/$3:$4
 }  
 
 ##################################################################
@@ -1194,9 +1300,9 @@ docker tag $1/$2:latest $1/$3:$4
 docker_tag_images() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
-docker_tag_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_tag_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_tag_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_tag_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKERHUB_MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_tag_image  ${DOCKER_USER} ${SERVICE_IMAGE}  ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_tag_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
 docker images | grep  ${DOCKER_VERSION_TAG}   
 docker images | grep  ${DOCKER_VERSION_TAG}      >> ${LOG_DIR}
 create_logfile_footer ${FUNCNAME[0]} $@
@@ -1214,10 +1320,9 @@ create_logfile_header ${FUNCNAME[0]} $@
 #docker tag waardepapieren_clerk-frontend $DOCKER_USER/waardepapieren-clerk-frontend:$DOCKER_VERSION_TAG
 #docker tag ${DOCKER_USER}/$MOCK_NLX_IMAGE:latest ${DOCKER_USER}/${DOCKERHUB_MOCK_NLX_IMAGE}:${DOCKER_VERSION_TAG}
 arg1=$1 #${DOCKER_USER}
-arg2=$2 #${MOCK_NLX_IMAGE}
-arg3=$3 #${DOCKERHUB_MOCK_NLX_IMAGE}
-arg4=$4 #${DOCKER_VERSION_TAG}
-docker tag $1/$2:latest $1/$3:$4
+arg3=$2 #${DOCKERHUB_MOCK_NLX_IMAGE}
+arg4=$3 #${DOCKER_VERSION_TAG}
+docker push  $1/$2:$3
 }  
 
 
@@ -1229,9 +1334,9 @@ docker tag $1/$2:latest $1/$3:$4
 docker_push_images() {
 echo "Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
-docker_push_image  ${DOCKER_USER} ${MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_push_image  ${DOCKER_USER} ${SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
-docker_push_image  ${DOCKER_USER} ${CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG} 
+docker_push_image  ${DOCKER_USER} ${DOCKERHUB_MOCK_NLX_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_push_image  ${DOCKER_USER} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
+docker_push_image  ${DOCKER_USER} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG} 
 create_logfile_footer
 }
 
@@ -1273,12 +1378,12 @@ create_logfile_footer
 # Arguments: 
 # Return: 
 ##################################################################
-create_azure_resourcegroup() {
+azure_create_resourcegroup() {
 echo "-- Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
 #az group create --name $AZ_RESOURCE_GROUP --location westeurope
-az group create --name $1 --location westeurope
+az group create --name $AZ_RESOURCE_GROUP --location westeurope
 enter_cont
 }
 
@@ -1287,12 +1392,12 @@ enter_cont
 # Arguments: 
 # Return: 
 ##################################################################
-delete_azure_resourcegroup() {
+azure_delete_resourcegroup() {
 echo "-- Running:${FUNCNAME[0]} $@ "
 create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
 #az group delete --name $AZ_RESOURCE_GROUP
-az group delete --name $1
+az group delete --name $AZ_RESOURCE_GROUP
 enter_cont
 }
 
@@ -1301,43 +1406,32 @@ enter_cont
 # Arguments: 
 # Return: 
 ##################################################################
-create_azure_containergroup() {
+azure_create_containergroup() {
 echo "-- Running:${FUNCNAME[0]} $@"
 create_logfile_header ${FUNCNAME[0]} $@
 az login -u $AZURE_USER  -p $AZURE_PWD
 enter_cont
 cd ${GITHUB_DIR}
+
+
+FILE=$GITHUB_DIR/deploy-aci.yaml
+if test -f "$FILE"; then
+    echo "$FILE exist"
+ else set_azure_deploy_aci_yaml   
+fi
+
+
 #az container create --resource-group $AZ_RESOURCE_GROUP --file deploy-aci.yaml
-az container create --resource-group $1 --file deploy-aci.yaml
+az container create --resource-group $AZ_RESOURCE_GROUP --file $GITHUB_DIR/deploy-aci.yaml
 enter_cont
+cd $GITHUB_DIR
 # https://docs.microsoft.com/en-us/azure/container-instances/container-instances-multi-container-yaml
 # View deployment state
 # az container show --resource-group ${AZ_RESOURCE_GROUP} --name myContainerGroup --output table
 }
 
-##################################################################
-# Purpose: az_container_show
-# Arguments: 
-# Return: CI CD 
-##################################################################
-az_container_show() {
-echo "-- Running:${FUNCNAME[0]} $@"  
-create_logfile_header ${FUNCNAME[0]} $@
-#az container show --resource-group ${AZ_RESOURCE_GROUP} --name $2 --output table
-az container show --resource-group $1--name $2 --output table
-}
 
-##################################################################
-# Purpose: Procedure to create the azure containergroup
-# Arguments: 
-# Return: CI CD 
-##################################################################
-restart_azure_containergroup() {
-echo "-- Running:${FUNCNAME[0]} $@"  
-cd ${PROJECT_DIR}
-az container restart --resource-group ${AZ_RESOURCE_GROUP}
-#az container restart --resource-group $1
-}
+
 
 ##################################################################
 # Purpose: Procedure to clone build run ship and deploy 
@@ -1367,9 +1461,9 @@ docker_push_images
 #docker_push_image  ${DOCKER_USER} ${DOCKERHUB_SERVICE_IMAGE} ${DOCKER_VERSION_TAG}  
 #docker_push_image  ${DOCKER_USER} ${DOCKERHUB_CLERK_FRONTEND_IMAGE} ${DOCKER_VERSION_TAG}  
 
-delete_azure_resourcegroup  $AZ_RESOURCE_GROUP
-create_azure_resourcegroup  $AZ_RESOURCE_GROUP
-create_azure_containergroup $AZ_RESOURCE_GROUP
+azure_delete_resourcegroup  $AZ_RESOURCE_GROUP
+azure_create_resourcegroup  $AZ_RESOURCE_GROUP
+azure_create_containergroup $AZ_RESOURCE_GROUP
 create_logfile_footer
 
 
@@ -1687,10 +1781,10 @@ show_menus() {
   echo "43. docker_login                 $DOCKER_USER               " 
   echo "44. docker_push_images           $DOCKERHUB_MOCK_NLX_IMAGE + $DOCKERHUB_SERVICE_IMAGE + $DOCKERHUB_CLERK_FRONTEND_IMAGE " 
   echo "50. azure_login                  $AZURE_USER                "  
-  echo "52. delete_azure_resourcegroup   $AZ_RESOURCE_GROUP         "
-  echo "53. create_azure_resourcegroup   $AZ_RESOURCE_GROUP         " 
-  echo "54. create_azure_containergroup  $AZ_RESOURCE_GROUP         " 
-  echo "59. restart_azure_containergroup $AZ_RESOURCE_GROUP         " 
+  echo "51. azure_delete_resourcegroup   $AZ_RESOURCE_GROUP         "
+  echo "52. azure_create_resourcegroup   $AZ_RESOURCE_GROUP         " 
+  echo "53. azure_create_containergroup  $AZ_RESOURCE_GROUP         " 
+  echo "59. azure_restart_containergroup $AZ_RESOURCE_GROUP         " 
   echo "60. https://github.com/BoschPeter/$GIT_REPO   "
   echo "61. https://hub.docker.com/?ref=login         " 
   echo "62. https://portal.azure.com/\#home           " 
@@ -1726,10 +1820,10 @@ read_options(){
         43) docker_login                                            ;; 
         44) docker_push_images                                      ;; 
         50) azure_login                                             ;; 
-        50) delete_azure_resourcegroup                              ;;
-        51) create_azure_resourcegroup                              ;; 
-        53) create_azure_containergroup                             ;; 
-        53) restart_azure_containergroup                            ;; 
+        51) azure_delete_resourcegroup                              ;;
+        52) azure_create_resourcegroup                              ;; 
+        53) azure_create_containergroup                             ;; 
+        59) azure_restart_containergroup                            ;; 
         60) bookmark_open https://github.com/BoschPeter/$GIT_REPO   ;;
         61) bookmark_open https://hub.docker.com/?ref=login         ;; 
         62) bookmark_open https://portal.azure.com/\#home           ;; 
