@@ -1,9 +1,10 @@
 #! /bin/bash
 # //////////////////////////////////////////////////////////////////////////////////////////
-#   File Type   :- BASH Script (needs GIT-CLI,  docker-CLI and AZURE-CLI installed)
+#   File Type   :- BASH Script (needs GIT-CLI,  docker-CLI and AZURE-CLI installed). 
 #  
 #   Description :- This script builds "waardepapieren" containers and ships images to hub.docker.com and beyond to ACI
 #   Modified           Date           Description
+#   Peter Bosch       31.12.2019      processing technical dept 
 #   Peter Bosch       20.12.2019      processing technical dept
 #   Peter Bosch       05.12.2019      Initial version.
 #
