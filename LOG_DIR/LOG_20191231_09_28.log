@@ -1,14 +1,14 @@
-20191230_22_48 - BEGIN JOB:
+20191231_09_28 - BEGIN JOB:
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
 #######################
 ## variables
 #######################
-PROJECT_DIR=/home/boscp08/Projects/scratch/virtual-insanity
+PROJECT_DIR=/Users/boscp08/Projects/scratch/virtual-insanity
 GIT_USER=BoschPeter
 GIT_REPO=AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
-GITHUB_DIR=/home/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
+GITHUB_DIR=/Users/boscp08/Projects/scratch/virtual-insanity/AZ_ACI_waardepapieren-demo_westeurope_azurecontainer_io
 DOCKER_USER=boscp08
 COMPOSE_BUILD_FLAG= --build
 MOCK_NLX_IMAGE=waardepapieren_mock-nlx
